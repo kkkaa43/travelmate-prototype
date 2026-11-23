@@ -1,0 +1,1438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TravelMate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF6F1; --surface:#FFFFFF; --surface-2:#F5EEE6; --line:#EADFD3;
+  --ink:#3A1F14; --ink-2:#6E5A4E; --ink-3:#9A887C;
+  --brand:#E2692A; --brand-dk:#C4561C; --brand-soft:#FCEADF; --brand-line:#F3C3A4;
+  --ok:#2F7A4B; --ok-soft:#E5F2E7; --warn:#A8670E; --warn-soft:#FBF0DC; --bad:#B4382B; --bad-soft:#FBE6E2;
+  --radius:18px; --shadow:0 1px 2px rgba(58,31,20,.06),0 6px 20px rgba(58,31,20,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:#E9E1D8;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+input{font:inherit;color:inherit}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- device shell ---------- */
+.device{width:390px;height:844px;background:var(--bg);border-radius:48px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 10px #1d1410,0 0 0 11px #3b2d25,0 30px 80px rgba(0,0,0,.35)}
+.statusbar{position:absolute;top:0;left:0;right:0;height:47px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px 0 36px;font-weight:700;font-size:15px;z-index:30;pointer-events:none;background:var(--bg)}
+.statusbar .notch{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:120px;height:34px;border-radius:20px;background:#120b08}
+.statusbar .sb-r{display:flex;gap:6px;align-items:center}
+.app{position:absolute;inset:0;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:47px 0 24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#1d1410;opacity:.85;z-index:40;pointer-events:none}
+@media (max-width:500px){
+  body{background:var(--bg);display:block}
+  .device{width:100%;height:100dvh;border-radius:0;box-shadow:none}
+  .statusbar,.homebar{display:none}
+  .scroll{padding-top:env(safe-area-inset-top)}
+}
+
+/* ---------- common ---------- */
+.px{padding-left:20px;padding-right:20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 6px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:-.2px}
+.brand .logo{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center}
+.brand .logo svg{width:18px;height:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink-2)}
+.navbar{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 12px;position:sticky;top:0;z-index:20;background:rgba(250,246,241,.94);backdrop-filter:blur(10px)}
+.iconbtn{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow)}
+.iconbtn:active{transform:scale(.96)}
+.navbar .ttl{flex:1;min-width:0}
+.navbar .ttl b{display:block;font-size:17px;font-weight:800}
+.navbar .ttl > span{display:block;font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1{font-size:27px;line-height:1.15;margin:6px 0 4px;font-weight:800;letter-spacing:-.5px}
+.sub{color:var(--ink-2);font-size:14px;margin:0 0 16px;line-height:1.45}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 16px 14px;padding:16px}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-h h3{margin:0;font-size:15px;font-weight:800}
+.label{font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.6px}
+.muted{color:var(--ink-2)}
+.tiny{font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.chip svg{width:13px;height:13px}
+.chip.brand{background:var(--brand-soft);color:var(--brand-dk)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;border-radius:16px;font-weight:800;font-size:16px;
+  background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(226,105,42,.3);transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--surface);color:var(--brand-dk);box-shadow:inset 0 0 0 1.5px var(--brand-line)}
+.btn.sm{height:40px;font-size:14px;border-radius:12px;box-shadow:none}
+.btn.ghost.sm{box-shadow:inset 0 0 0 1.5px var(--brand-line)}
+.btn[disabled]{background:#D9CFC6;box-shadow:none;cursor:not-allowed}
+.sticky-cta{position:sticky;bottom:0;padding:12px 16px 26px;background:linear-gradient(rgba(250,246,241,0),var(--bg) 30%);z-index:15}
+.footer-cta{padding:10px 16px 12px;background:var(--bg);position:relative;z-index:15;box-shadow:0 -10px 16px -6px rgba(250,246,241,1)}
+.footer-cta.solo{padding-bottom:30px}
+@media (max-width:500px){.footer-cta.solo{padding-bottom:max(14px,env(safe-area-inset-bottom))}}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.money{font-variant-numeric:tabular-nums}
+
+/* ---------- form ---------- */
+.field{display:flex;align-items:center;gap:12px;padding:10px 0}
+.field .ic{width:36px;height:36px;border-radius:11px;background:var(--brand-soft);color:var(--brand-dk);display:grid;place-items:center;flex:none}
+.field .fbody{flex:1;min-width:0}
+.field .fbody .label{display:block;margin-bottom:2px}
+.field input[type=text]{border:0;outline:0;background:transparent;font-weight:700;font-size:16px;width:100%;padding:0}
+.dates{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:end}
+.datebox{position:relative;margin-top:4px}
+.datebox button{width:100%;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:10px 10px;font-weight:700;font-size:14px;background:var(--surface);text-align:left}
+.datebox button svg{width:16px;height:16px;color:var(--brand-dk)}
+.datebox input{position:absolute;left:0;bottom:0;width:100%;height:100%;opacity:0;pointer-events:none;border:0}
+.dates .arrow{padding-bottom:11px;color:var(--ink-3)}
+.nights{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.err{color:var(--bad);font-size:12px;font-weight:600;margin-top:6px}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:32px;height:32px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center}
+.stepper button[disabled]{opacity:.35;cursor:default}
+.stepper b{min-width:14px;text-align:center}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.budget-in{display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:14px;padding:6px 14px;margin-top:8px}
+.budget-in:focus-within{border-color:var(--brand)}
+.budget-in .cur{font-weight:700;color:var(--ink-3);font-size:14px;white-space:nowrap}
+.budget-in input{border:0;outline:0;font-size:26px;font-weight:800;width:100%;background:transparent;padding:4px 0}
+.quick{display:flex;gap:8px;margin-top:10px}
+.quick button{flex:1;padding:8px 0;border-radius:10px;background:var(--surface-2);font-weight:700;font-size:13px;color:var(--ink-2)}
+.quick button.on{background:var(--brand-soft);color:var(--brand-dk);box-shadow:inset 0 0 0 1.5px var(--brand-line)}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;padding:8px 4px;border-radius:10px;font-size:12.5px;font-weight:700;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(58,31,20,.12)}
+.pref-q{font-size:13px;font-weight:700;margin:14px 0 8px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
+.pill.on{background:var(--brand-soft);color:var(--brand-dk);box-shadow:inset 0 0 0 1.5px var(--brand)}
+.pill svg{width:14px;height:14px}
+.switch{width:46px;height:28px;border-radius:999px;background:#D9CFC6;position:relative;transition:background .15s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s}
+.switch.on{background:var(--brand)}
+.switch.on::after{left:21px}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:4px 0}
+.collapse-h{display:flex;align-items:center;gap:10px;width:100%;text-align:left}
+.collapse-h .chev{transition:transform .2s;color:var(--ink-3)}
+.collapse-h.open .chev{transform:rotate(180deg)}
+
+/* ---------- tab bar ---------- */
+.tabbar{display:flex;justify-content:space-around;padding:8px 10px 28px;background:var(--surface);border-top:1px solid var(--line)}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--ink-3);width:80px}
+.tabbar button.on{color:var(--brand)}
+.tabbar svg{width:22px;height:22px}
+@media (max-width:500px){.tabbar{padding-bottom:max(12px,env(safe-area-inset-bottom))}}
+
+/* ---------- compare ---------- */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 12px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fchip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:12.5px;font-weight:700;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);white-space:nowrap;color:var(--ink-2)}
+.fchip.on{background:var(--ink);color:#fff;box-shadow:none}
+.fchip svg{width:14px;height:14px}
+.rec{background:linear-gradient(135deg,#FFF6EF,#FDE7D8);box-shadow:inset 0 0 0 1.5px var(--brand-line);border-radius:var(--radius);margin:0 16px 16px;padding:14px 16px}
+.rec .rh{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px}
+.rec .rh .star{width:26px;height:26px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center}
+.rec .rh .star svg{width:15px;height:15px;fill:#fff;stroke:none}
+.rec ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.rec li{display:flex;gap:8px;font-size:13px;align-items:flex-start;line-height:1.35}
+.rec li svg{width:16px;height:16px;color:var(--ok);margin-top:1px}
+.rec .why{font-size:12px;color:var(--ink-2);margin-top:8px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px}
+.sec-h h2{font-size:17px;margin:0;font-weight:800}
+.picker{display:flex;gap:6px}
+.picker button{width:34px;height:34px;border-radius:10px;font-weight:800;font-size:13px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink-2);position:relative}
+.picker button.on{background:var(--ink);color:#fff;box-shadow:none}
+.picker button.off{opacity:.45}
+.cmp{margin:0 16px 14px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.cmp-cols{display:grid;grid-template-columns:1fr 1fr}
+.cmp-col{padding:12px 12px 14px;min-width:0;position:relative}
+.cmp-col + .cmp-col{border-left:1px solid var(--line)}
+.cmp-col.is-rec{background:linear-gradient(#FFF8F3,#fff 120px)}
+.cmp-col .ph{height:84px;border-radius:12px;background-size:cover;background-position:center;margin-bottom:10px;position:relative}
+.cmp-col .ph .badge{position:absolute;left:6px;top:6px;font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.95);color:var(--brand-dk)}
+.cmp-col .pname{display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:15px}
+.cmp-col .total{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+.cmp-col .left{font-size:12.5px;font-weight:700;color:var(--ok);margin-top:1px}
+.cmp-col .left.bad{color:var(--bad)}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;min-height:24px}
+.tags .chip{font-size:11px;padding:4px 8px}
+.cmp-row{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.cmp-row > div{padding:10px 12px;min-width:0}
+.cmp-row > div + div{border-left:1px solid var(--line)}
+.cmp-row .rl{grid-column:1/-1;padding:8px 12px 0;font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:6px;border:0}
+.cmp-row .rl svg{width:14px;height:14px}
+.cmp-row .rl + div{border-left:0}
+.cmp-row .v{font-weight:700;font-size:13.5px;line-height:1.3}
+.cmp-row .s{font-size:12px;color:var(--ink-2);margin-top:2px;line-height:1.35}
+.cmp-row .better{color:var(--ok)}
+.cmp-row .worse{color:var(--warn)}
+.cmp-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;border-top:1px solid var(--line);background:#FFFCF9}
+.summary-line{margin:0 16px 16px;padding:12px 14px;border-radius:14px;background:var(--surface-2);font-size:13px;line-height:1.45;display:flex;gap:10px}
+.summary-line svg{color:var(--brand-dk);margin-top:1px}
+.pk{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);margin:0 16px 10px;padding:10px;text-align:left;width:calc(100% - 32px)}
+.pk .thumb{width:64px;height:64px;border-radius:12px;background-size:cover;background-position:center;flex:none}
+.pk .pb{flex:1;min-width:0}
+.pk .pt{display:flex;justify-content:space-between;align-items:center;font-weight:800}
+.pk .pt .money{font-size:16px}
+.pk .ps{font-size:12px;color:var(--ink-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk .pr{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.pk.dim{opacity:.62}
+.pk:active{transform:scale(.99)}
+.pk .cmpbox{width:24px;height:24px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;flex:none}
+.pk .cmpbox.on{background:var(--ink);color:#fff;box-shadow:none}
+.pk .cmpbox svg{width:15px;height:15px}
+.hidden-note{margin:4px 20px 12px;font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:center}
+.footnote{text-align:center;font-size:11px;color:var(--ink-3);margin:6px 20px 10px;line-height:1.5}
+
+/* ---------- details ---------- */
+.pos{color:var(--ok)} .neg{color:var(--bad)}
+.acc{padding:14px 14px 14px}
+.acc-h{display:flex;gap:12px;align-items:center;width:100%;text-align:left}
+.acc-ic{width:44px;height:44px;border-radius:13px;background:var(--brand-soft);color:var(--brand-dk);display:grid;place-items:center;flex:none}
+.acc-ic svg{width:21px;height:21px}
+.acc-thumb{width:44px;height:44px;border-radius:13px;background-size:cover;background-position:center;flex:none}
+.acc-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.acc-b b{font-size:15px}
+.acc-b .tiny{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc-p{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.acc-p b{font-size:17px}
+.more{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:12px;padding:9px;border-radius:12px;background:var(--surface-2);font-size:13px;font-weight:700;color:var(--ink-2)}
+.more .chev{width:16px;height:16px;transition:transform .2s}
+.acc.open .more .chev{transform:rotate(180deg)}
+.acc-body{margin-top:14px}
+.leg{border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.leg-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.leg-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.leg-row b{display:block;font-size:19px}
+.leg-row span{display:block;font-weight:700;font-size:13px}
+.leg-row small{display:block;font-size:11.5px;color:var(--ink-3)}
+.leg-line{position:relative;text-align:center;font-size:11.5px;color:var(--ink-2);font-weight:700;padding-bottom:14px}
+.leg-line::after{content:"";position:absolute;left:0;right:0;bottom:5px;height:2px;background:repeating-linear-gradient(90deg,var(--brand-line) 0 6px,transparent 6px 10px)}
+.leg-line span{font-weight:700;font-size:11.5px}
+.layover{display:flex;gap:8px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:12.5px;font-weight:700}
+.layover svg{width:15px;height:15px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.facts > div{display:flex;gap:8px;padding:10px;border-radius:12px;background:var(--surface-2);font-size:12px;color:var(--ink-2);line-height:1.35}
+.facts > div svg{width:16px;height:16px;color:var(--brand-dk);margin-top:1px}
+.facts b{display:block;color:var(--ink);font-size:12.5px}
+.facts .okc{background:var(--ok-soft)} .facts .okc svg,.facts .okc b{color:var(--ok)}
+.facts .warnc{background:var(--warn-soft)} .facts .warnc svg,.facts .warnc b{color:var(--warn)}
+.fit{display:flex;gap:9px;padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.45}
+.fit svg{width:17px;height:17px;margin-top:1px}
+.fit.ok{background:var(--ok-soft);color:#24553A} .fit.ok svg{color:var(--ok)}
+.fit.warn{background:var(--warn-soft);color:#7A4A08} .fit.warn svg{color:var(--warn)}
+.source{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:var(--ink-2)}
+.source > svg{width:15px;height:15px;color:var(--ok)}
+.source > span{flex:1}
+.source button{display:flex;align-items:center;gap:4px;font-weight:700;color:var(--brand-dk);font-size:12.5px}
+.source button svg{width:13px;height:13px}
+.keep{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.keep > span{display:flex;gap:10px;align-items:center}
+.keep > span > svg{color:var(--brand-dk)}
+.keep b{display:block;font-size:14px}
+.keep small{display:block;font-size:12px;color:var(--ink-2)}
+.gallery{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:70px 70px;gap:6px;margin-bottom:6px}
+.gallery div{border-radius:12px;background-size:cover;background-position:center}
+.gallery .big{grid-row:1/3}
+.gallery div:only-child{grid-column:1/-1}
+.sub-h{font-size:13px;font-weight:800;margin:16px 0 8px}
+.room{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;box-shadow:inset 0 0 0 1.5px var(--line);margin-bottom:8px}
+.room.on{box-shadow:inset 0 0 0 2px var(--brand);background:#FFF8F3}
+.radio{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2px #CDBFB3;flex:none;position:relative;display:inline-block}
+.room.on .radio,.radio.on{box-shadow:inset 0 0 0 2px var(--brand)}
+.room.on .radio::after,.radio.on::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--brand)}
+.room .rb{flex:1}
+.room b{display:block;font-size:14px}
+.room small{display:block;font-size:12px;color:var(--ink-2);margin-top:1px}
+.room .rp{text-align:right}
+.nightly{border-radius:14px;background:var(--surface-2);padding:6px 12px}
+.nightly > div{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+.nightly > div span{color:var(--ink-2)}
+.nightly .tot{border-top:1px solid var(--line);margin-top:4px;padding-top:8px}
+.nightly .tot span{color:var(--ink);font-weight:700}
+.map{width:100%;height:auto;border-radius:14px;display:block}
+.spots{display:grid;gap:2px;margin-top:8px}
+.spots > div{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 2px;border-bottom:1px dashed var(--line)}
+.spots > div:last-child{border-bottom:0}
+.spots span{display:flex;gap:8px;align-items:center;color:var(--ink-2)}
+.spots svg{width:15px;height:15px;color:var(--brand-dk)}
+.bline{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:5px 0}
+.bline span{display:flex;gap:8px;align-items:center;color:var(--ink-2)}
+.bline span svg{width:16px;height:16px}
+.bline.big{font-weight:800;font-size:15px}
+.bline.big span{color:var(--ink)}
+.bline.big b{font-size:20px}
+.bar{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin:10px 0 6px}
+.bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),#F08A4B)}
+.bar span.over{background:var(--bad)}
+.linkbtn{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:10px;padding:12px;border-radius:12px;background:var(--brand-soft);color:var(--brand-dk);font-weight:700;font-size:13.5px}
+.bar-cta{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);box-shadow:none}
+.bar-cta > div{display:flex;flex-direction:column;min-width:96px}
+.bar-cta > div b{font-size:20px;line-height:1.1}
+.bar-cta .btn{flex:1}
+/* change hotel */
+.kept{display:flex;gap:12px;align-items:center;margin:0 16px 12px;padding:12px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--ok-soft),var(--shadow)}
+.kept b{font-size:14px}
+.hcard{display:flex;flex-direction:column;background:var(--surface);border-radius:18px;box-shadow:var(--shadow);margin:0 16px 12px;overflow:hidden;cursor:pointer}
+.hcard.on{box-shadow:0 0 0 2px var(--brand),var(--shadow)}
+.hcard.dim{opacity:.55}
+.hph{height:104px;background-size:cover;background-position:center;position:relative}
+.hph .badge{position:absolute;left:10px;top:10px;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.95);color:var(--ink)}
+.hb{padding:10px 14px 12px}
+.hb .pt{display:flex;justify-content:space-between;align-items:center}
+.hb .pt b{font-size:16px}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.hrow b{font-size:16px}
+.eq{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.eq span{display:flex;flex-direction:column}
+.eq small{font-size:11px;color:var(--ink-3);font-weight:600}
+.eq b{font-size:15px}
+.eq i{font-style:normal;color:var(--ink-3);font-weight:700}
+.eq .nt b{color:var(--brand-dk)}
+.footer-cta.solo{border-top:1px solid var(--line);box-shadow:none}
+
+/* budget page */
+.stack{display:flex;height:16px;border-radius:999px;overflow:hidden;background:var(--surface-2)}
+.stack span{height:100%}
+.stack-mark{position:absolute;top:0;bottom:-6px;border-left:2px dashed var(--ink);}
+.stack-mark span{position:absolute;top:-2px;right:4px;font-size:10.5px;font-weight:700;white-space:nowrap;color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:11.5px;color:var(--ink-2);font-weight:600}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.card-h h3{display:flex;align-items:center;gap:8px}
+.card-h h3 svg{width:17px;height:17px;color:var(--brand-dk)}
+.act{display:flex;align-items:center;gap:12px;width:100%;padding:10px 4px;border-bottom:1px dashed var(--line)}
+.act:last-child{border-bottom:0}
+.act b{display:block;font-size:14px}
+.act small{display:block;font-size:11.5px;color:var(--ink-2);font-weight:500}
+.cbox{width:22px;height:22px;border-radius:7px;box-shadow:inset 0 0 0 1.5px #CDBFB3;display:grid;place-items:center;flex:none}
+.act.on .cbox{background:var(--brand);box-shadow:none;color:#fff}
+.cbox svg{width:15px;height:15px}
+/* review */
+.banner{height:118px;margin:0 16px 14px;border-radius:var(--radius);background-size:cover;background-position:center 40%;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 16px;color:#fff;position:relative}
+.banner b{font-size:24px;font-weight:800;letter-spacing:-.4px;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.banner span{font-size:13px;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.banner.sm{height:104px;margin:0;border-radius:var(--radius) var(--radius) 0 0}
+.rv{padding:14px 16px}
+.rv-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rv-h span{display:flex;gap:8px;align-items:center;font-weight:800;font-size:14.5px}
+.rv-h span svg{color:var(--brand-dk);width:17px;height:17px}
+.rv-h button{font-weight:700;font-size:13px;color:var(--brand-dk);padding:5px 12px;border-radius:999px;background:var(--brand-soft)}
+.rv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.rv-grid small,.rv-row small{display:block;font-size:12px;color:var(--ink-2);line-height:1.45}
+.rv-grid b{display:block;font-size:14px}
+.rv-row{display:flex;justify-content:space-between;gap:10px}
+.rv-row b{font-size:14px}
+.rv-p{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}
+.rv-p b{font-size:16px}
+.rv-p small{white-space:nowrap}
+/* done */
+.done-hero{text-align:center;padding:30px 24px 18px}
+.done-ic{width:76px;height:76px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;margin:0 auto;box-shadow:0 0 0 10px var(--ok-soft)}
+.done-ic svg{width:38px;height:38px;stroke-width:3}
+.step{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;background:var(--surface-2);margin-bottom:8px}
+.step span:nth-child(2){flex:1}
+.step b{display:block;font-size:14px}
+.step small{display:block;font-size:12px;color:var(--ink-2)}
+.step .num{width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+.step > svg{color:var(--brand-dk)}
+/* trips */
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:80px 40px;color:var(--ink-2)}
+.empty > svg{width:44px;height:44px;color:var(--ink-3)}
+.empty b{color:var(--ink);font-size:17px}
+.empty span{font-size:13.5px;line-height:1.5}
+.trip{margin:6px 16px 12px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow)}
+.trip-b{padding:12px 14px 14px}
+.trow{display:flex;gap:10px;align-items:center;padding:8px;border-radius:12px;margin:0 -8px}
+.trow b{font-size:14px}
+.trow small{display:block;font-size:12px;color:var(--ink-2);line-height:1.4}
+.trow.flag{background:#FFF7EC}
+.warnt{color:var(--warn) !important}
+.alert-card{display:flex;align-items:center;gap:12px;margin:6px 16px 12px;padding:12px 14px;border-radius:16px;background:var(--warn-soft);box-shadow:inset 0 0 0 1.5px #F0CF95;width:calc(100% - 32px)}
+.alert-card b{display:block;font-size:14px;color:#6E4305}
+.alert-card small{display:block;font-size:12.5px;color:#7A4A08;line-height:1.4;margin-top:2px}
+.alert-card .al-ic{width:36px;height:36px;border-radius:11px;background:#F6DDA9;color:var(--warn);display:grid;place-items:center;flex:none}
+.chg{display:flex;gap:12px;padding:6px 0;font-size:13.5px}
+.chg > span{width:52px;flex:none;font-size:12px;font-weight:700;color:var(--ink-3);padding-top:1px}
+.chg s{color:var(--ink-3)}
+.chg small{display:block;font-size:12px;color:var(--ink-2)}
+.aff{display:flex;gap:10px;padding:9px 10px;border-radius:12px;margin-bottom:6px;font-size:13px}
+.aff svg{width:17px;height:17px;margin-top:1px}
+.aff b{display:block}
+.aff small{display:block;font-size:12px;color:var(--ink-2);margin-top:1px;line-height:1.4}
+.aff.bad{background:var(--warn-soft)} .aff.bad svg{color:var(--warn)}
+.aff.ok{background:var(--surface-2)} .aff.ok svg{color:var(--ok)}
+.opt{display:flex;gap:12px;align-items:flex-start;width:calc(100% - 32px);margin:0 16px 10px;padding:14px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+.opt.on{box-shadow:0 0 0 2px var(--brand),var(--shadow)}
+.opt b{display:block;font-size:14.5px}
+.opt small{display:block;font-size:12.5px;color:var(--ink-2);line-height:1.45;margin-top:3px}
+.opt .radio{margin-top:2px}
+
+/* ---------- sheets / toast ---------- */
+.toast{position:absolute;left:16px;right:16px;top:104px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;font-size:13px;font-weight:600;
+  display:flex;gap:10px;align-items:center;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:tin .2s ease-out}
+@keyframes tin{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+.toast.stay{animation:none}
+@media (max-width:500px){.toast{top:calc(env(safe-area-inset-top) + 64px)}}
+.loading{position:absolute;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:40px}
+.loading .spin{width:54px;height:54px;border-radius:50%;border:5px solid var(--brand-soft);border-top-color:var(--brand);animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading b{font-size:18px}
+.loading .steps{display:grid;gap:8px;font-size:13px;color:var(--ink-2);text-align:left}
+.loading .steps div{display:flex;gap:8px;align-items:center}
+.loading .steps svg{width:16px;height:16px;color:var(--ok)}
+.placeholder{margin:40px 24px;text-align:center;color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <div class="statusbar"><span>9:41</span><div class="notch"></div>
+    <div class="sb-r">
+      <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#3A1F14"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#3A1F14"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#3A1F14"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#3A1F14"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.5c2.3 0 4.4.9 6 2.4l1.2-1.3C13.3 1.8 10.8.7 8 .7S2.7 1.8.8 3.6L2 4.9c1.6-1.5 3.7-2.4 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3C11.4 5 9.8 4.3 8 4.3S4.6 5 3.4 6.1l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.6c-.6 0-1.1.2-1.5.6L8 11.8l1.5-1.5c-.4-.4-.9-.6-1.5-.6Z" fill="#3A1F14"/></svg>
+      <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="#3A1F14" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#3A1F14"/><rect x="24" y="4" width="1.5" height="4" rx=".75" fill="#3A1F14" opacity=".4"/></svg>
+    </div>
+  </div>
+  <div class="app" id="app"></div>
+  <div class="homebar"></div>
+</div>
+
+<script>
+/* =========================================================
+   Icons (Lucide-style strokes)
+   ========================================================= */
+const IC = {
+  plane:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  bed:'<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  cal:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  right:'<path d="m9 18 6-6-6-6"/>', left:'<path d="m15 18-6-6 6-6"/>', down:'<path d="m6 9 6 6 6-6"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  train:'<rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16M12 3v8M8 19l-2 3M18 22l-2-3M8 15h.01M16 15h.01"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
+  swap:'<path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>',
+  minus:'<path d="M5 12h14"/>', plus:'<path d="M5 12h14M12 5v14"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  ext:'<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  bag:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  walk:'<circle cx="13" cy="4" r="2"/><path d="m7 22 3-7 3 3v6M10 15l-2-4 4-3 3 3 3 1"/>',
+  ruler:'<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2"/>',
+};
+const ic = (n, cls='') => `<svg class="i ${cls}" viewBox="0 0 24 24">${IC[n]||''}</svg>`;
+
+/* =========================================================
+   Sample data (illustrative prices, CAD, taxes included)
+   ========================================================= */
+const FLIGHTS = {
+  F1:{id:'F1', airline:'Air Canada', code:'AC 1', fare:'Standard', stops:0, mins:13*60+15, price:1600,
+      out:{dep:'Mar 9 · 13:10', depA:'YYZ', arr:'Mar 10 · 15:25', arrA:'HND'},
+      ret:{dep:'Mar 15 · 17:05', depA:'HND', arr:'Mar 15 · 16:10', arrA:'YYZ', code:'AC 2', mins:12*60+5},
+      bags:'1 checked bag each', change:'Change for $150 · non-refundable', site:'aircanada.com'},
+  F2:{id:'F2', airline:'Air Canada', code:'AC 113 + AC 3', fare:'Standard', stops:1, via:'Vancouver (YVR)', layover:'2h 40m', mins:18*60+10, price:1300,
+      out:{dep:'Mar 9 · 08:00', depA:'YYZ', arr:'Mar 10 · 15:10', arrA:'HND'},
+      ret:{dep:'Mar 15 · 17:45', depA:'HND', arr:'Mar 15 · 18:05', arrA:'YYZ', code:'AC 4 + AC 126', mins:16*60+20},
+      bags:'1 checked bag each', change:'Change for $150 · non-refundable', site:'aircanada.com'},
+  F3:{id:'F3', airline:'Air Canada', code:'AC 1', fare:'Flex', stops:0, mins:13*60+15, price:1800,
+      out:{dep:'Mar 9 · 13:10', depA:'YYZ', arr:'Mar 10 · 15:25', arrA:'HND'},
+      ret:{dep:'Mar 15 · 17:05', depA:'HND', arr:'Mar 15 · 16:10', arrA:'YYZ', code:'AC 2', mins:12*60+5},
+      bags:'2 checked bags each', change:'Free changes · refundable', site:'aircanada.com'},
+  F4:{id:'F4', airline:'Korean Air', code:'KE 74 + KE 2101', fare:'Economy', stops:1, via:'Seoul (ICN)', layover:'3h 15m', retLayover:'1h 50m', mins:20*60+10, price:1400,
+      out:{dep:'Mar 9 · 12:30', depA:'YYZ', arr:'Mar 10 · 21:40', arrA:'HND'},
+      ret:{dep:'Mar 15 · 10:20', depA:'HND', arr:'Mar 15 · 12:55', arrA:'YYZ', code:'KE 2102 + KE 73', mins:16*60+35},
+      bags:'1 checked bag each', change:'Change for $200 · non-refundable', site:'koreanair.com', lateArrival:true},
+};
+const HOTELS = {
+  H1:{id:'H1', name:'Sakura Central', area:'Shinjuku', img:'img/sakura.jpg', imgLg:'img/sakura_lg.jpg', walk:4, station:'Shinjuku Stn',
+      rating:4.6, reviews:1284, cancel:'Free cancellation before Mar 8', freeCancel:true, checkin:'15:00', checkout:'11:00',
+      address:'3-12 Nishi-Shinjuku, Shinjuku City, Tokyo', site:'sakura-central.jp',
+      rooms:[{name:'2 Queen Beds', beds:2, size:32, rates:[150,160,160,180,200]},{name:'1 King Bed', beds:1, size:30, rates:[140,150,150,170,190]}]},
+  H2:{id:'H2', name:'Kumo Garden', area:'Asakusa', img:'img/kumo.jpg', imgLg:'img/kumo.jpg', walk:6, station:'Asakusa Stn',
+      rating:4.7, reviews:932, cancel:'Free cancellation before Mar 6', freeCancel:true, checkin:'15:00', checkout:'10:00',
+      address:'2-8 Kaminarimon, Taito City, Tokyo', site:'kumogarden.jp',
+      rooms:[{name:'2 Queen Beds', beds:2, size:36, rates:[200,200,210,220,220]},{name:'1 King Bed', beds:1, size:30, rates:[180,180,190,200,200]}]},
+  H3:{id:'H3', name:'Hikari Grand', area:'Ginza', img:'img/hikari.jpg', imgLg:'img/hikari.jpg', walk:3, station:'Ginza Stn',
+      rating:4.8, reviews:2107, cancel:'Non-refundable', freeCancel:false, checkin:'15:00', checkout:'12:00',
+      address:'5-4 Ginza, Chuo City, Tokyo', site:'hikarigrand.jp',
+      rooms:[{name:'1 King Bed', beds:1, size:38, rates:[210,210,220,230,230]}]},
+  H4:{id:'H4', name:'Mori Stay', area:'Ueno', img:'img/mori.jpg', imgLg:'img/mori.jpg', walk:9, station:'Ueno Stn',
+      rating:4.3, reviews:611, cancel:'Free cancellation before Mar 8', freeCancel:true, checkin:'16:00', checkout:'10:00',
+      address:'7-1 Ueno, Taito City, Tokyo', site:'moristay.jp',
+      rooms:[{name:'2 Queen Beds', beds:2, size:28, rates:[140,140,150,160,160]},{name:'1 Double Bed', beds:1, size:20, rates:[120,120,130,140,140]}]},
+};
+HOTELS.H5 = {id:'H5', name:'Shibuya Terrace', area:'Shibuya', img:'img/kumo_lobby.jpg', imgLg:'img/kumo_lobby.jpg', walk:5, station:'Shibuya Stn',
+  rating:4.5, reviews:1540, cancel:'Free cancellation before Mar 7', freeCancel:true, checkin:'15:00', checkout:'11:00',
+  address:'2-21 Shibuya, Shibuya City, Tokyo', site:'shibuyaterrace.jp',
+  rooms:[{name:'2 Queen Beds', beds:2, size:34, rates:[290,290,300,310,310]},{name:'1 King Bed', beds:1, size:28, rates:[250,250,260,270,270]}]};
+HOTELS.H1.gallery = ['img/sakura_lg.jpg','img/sakura_view.jpg','img/sakura_bath.jpg'];
+// Travel time from each hotel to common places (train unless noted) — supports DR3
+const SPOTS = {
+  H1:[['Shibuya','7 min'],['Tokyo Station','15 min'],['Asakusa (Senso-ji)','30 min'],['Haneda Airport','45 min']],
+  H2:[['Senso-ji Temple','6 min walk'],['Tokyo Station','15 min'],['Shibuya','35 min'],['Haneda Airport','40 min']],
+  H3:[['Tokyo Station','5 min'],['Asakusa (Senso-ji)','18 min'],['Shibuya','16 min'],['Haneda Airport','30 min']],
+  H4:[['Tokyo Station','8 min'],['Asakusa (Senso-ji)','10 min'],['Shibuya','30 min'],['Haneda Airport','40 min']],
+  H5:[['Shibuya Crossing','5 min walk'],['Shinjuku','7 min'],['Tokyo Station','25 min'],['Haneda Airport','35 min']],
+};
+const MAPXY = {Shinjuku:[70,72], Shibuya:[84,118], Ginza:[208,112], Ueno:[196,40], Asakusa:[244,30]};
+// Estimates for the rest of the trip (per person) — A2 Change 6
+const FOOD = {budget:[30,'Budget','Convenience stores, ramen, set lunches'], moderate:[55,'Moderate','Casual restaurants and a café stop'], comfort:[90,'Comfort','Sit-down dinners and izakaya nights']};
+const ACTS = [
+  {id:'teamlab', name:'teamLab Planets', price:45, note:'Digital art museum · Toyosu'},
+  {id:'skytree', name:'Tokyo Skytree deck', price:30, note:'Observation deck · near Asakusa'},
+  {id:'shibuyasky', name:'Shibuya Sky', price:35, note:'Rooftop view · Shibuya'},
+  {id:'museum', name:'Tokyo National Museum', price:10, note:'Ueno Park'},
+  {id:'hakone', name:'Day trip to Hakone', price:120, note:'Train pass + ropeway'},
+];
+const SEG_COLORS = {flight:'#E2692A', hotel:'#F2A574', food:'#7FB069', transit:'#5B8DB8', acts:'#A98BD0'};
+const PLAN_DEF = { A:{flight:'F1', hotel:'H1'}, B:{flight:'F2', hotel:'H2'}, C:{flight:'F3', hotel:'H3'}, D:{flight:'F4', hotel:'H4'} };
+const AREAS = ['Shinjuku','Asakusa','Ginza','Ueno'];
+
+/* =========================================================
+   State
+   ========================================================= */
+const S = {
+  screen:'plan', stack:[],
+  trip:{from:'Toronto (YYZ)', to:'Tokyo, Japan', checkIn:'2027-03-10', checkOut:'2027-03-15', adults:2, rooms:1, budget:3000},
+  prefs:{stops:'any', nearStation:false, areas:[], room:'any', priority:'balanced'},
+  prefsOpen:false,
+  compare:['A','B'],
+  showHidden:false,
+  loading:false, toast:null,
+  roomPick:{}, // planId -> room index chosen by the user
+  extras:{food:'budget', transit:8, acts:[]}, extrasSaved:false,
+  saved:null, // confirmed trip
+};
+const FRESH = JSON.stringify(S);
+function extrasCost(n){
+  const days = n + 1, a = S.trip.adults, e = S.extras;
+  const food = FOOD[e.food][0] * days * a;
+  const transit = (e.transit * days + 30) * a; // daily IC card + airport round trip
+  const acts = e.acts.reduce((s,id)=>s + ACTS.find(x=>x.id===id).price, 0) * a;
+  return {food, transit, acts, sum: food + transit + acts, days};
+}
+
+/* =========================================================
+   Helpers / model
+   ========================================================= */
+const $ = n => '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const dur = m => `${Math.floor(m/60)}h ${String(m%60).padStart(2,'0')}m`;
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const parseD = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const fmtD = s => { const d = parseD(s); return `${MONTHS[d.getMonth()]} ${d.getDate()}`; };
+function nights(){
+  if(!S.trip.checkIn || !S.trip.checkOut) return 0;
+  return Math.round((parseD(S.trip.checkOut) - parseD(S.trip.checkIn)) / 864e5);
+}
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const fmtDay = s => { if(!s) return 'Select'; const d = parseD(s); return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`; };
+const dateRange = () => `${fmtD(S.trip.checkIn)}–${fmtD(S.trip.checkOut).replace(MONTHS[parseD(S.trip.checkIn).getMonth()]+' ','')}`;
+function roomMatches(room){
+  if(S.prefs.room==='twin') return room.beds >= 2;
+  if(S.prefs.room==='one') return room.beds === 1;
+  return true;
+}
+function roomIndex(pid){
+  const h = HOTELS[PLAN_DEF[pid].hotel];
+  if(S.roomPick[pid] != null) return S.roomPick[pid];
+  const i = h.rooms.findIndex(roomMatches);
+  return i < 0 ? 0 : i;
+}
+function hotelCost(room, n){ let t=0; for(let i=0;i<n;i++) t += room.rates[i % room.rates.length]; return t; }
+function combo(fid, hid, ri){
+  const f = FLIGHTS[fid], h = HOTELS[hid];
+  const room = h.rooms[Math.min(ri, h.rooms.length-1)], n = nights();
+  const hotelTotal = hotelCost(room, n);
+  const total = f.price + hotelTotal;
+  return {f, h, room, ri, n, hotelTotal, perNight: Math.round(hotelTotal/Math.max(n,1)), total, left: S.trip.budget - total};
+}
+function plan(pid){ return {id:pid, ...combo(PLAN_DEF[pid].flight, PLAN_DEF[pid].hotel, roomIndex(pid))}; }
+function cur(){ const c = S.cur; return {id:c.base, custom:c.hotel!==PLAN_DEF[c.base].hotel, ...combo(c.flight, c.hotel, c.room)}; }
+function bestRoom(h){ const i = h.rooms.findIndex(roomMatches); return i < 0 ? 0 : i; }
+function nightDates(){
+  const out = [], d0 = parseD(S.trip.checkIn);
+  for(let i=0;i<nights();i++){ const d = new Date(d0); d.setDate(d0.getDate()+i); out.push(`${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`); }
+  return out;
+}
+function mismatch(p){
+  const r = [];
+  if(p.left < 0) r.push(`Over budget by ${$(p.left)}`);
+  if(S.prefs.stops==='nonstop' && p.f.stops>0) r.push('Has 1 stop');
+  if(S.prefs.nearStation && p.h.walk>5) r.push(`${p.h.walk} min to station`);
+  if(S.prefs.areas.length && !S.prefs.areas.includes(p.h.area)) r.push(`Not in ${S.prefs.areas.join(' / ')}`);
+  if(S.prefs.room!=='any' && !p.h.rooms.some(roomMatches)) r.push(S.prefs.room==='twin' ? 'No room with 2 beds' : 'No room with 1 large bed');
+  return r;
+}
+const score = {
+  balanced: p => p.left/40 - p.f.stops*12 - (p.f.lateArrival?8:0) - p.h.walk*1.2 + p.h.rating*4 + (p.h.freeCancel?4:0),
+  price:    p => p.left,
+  travel:   p => -p.f.mins - p.f.price/1000,
+  location: p => -p.h.walk*10 + p.h.rating*5,
+};
+function ranked(){
+  const all = Object.keys(PLAN_DEF).map(plan);
+  const fit = all.filter(p => !mismatch(p).length).sort((a,b)=>score[S.prefs.priority](b)-score[S.prefs.priority](a));
+  const out = all.filter(p => mismatch(p).length);
+  return {fit, out, rec: fit[0] || null};
+}
+function recReasons(p){
+  const r = [];
+  if(p.f.stops===0) r.push(`Nonstop flight · ${dur(p.f.mins)} to Tokyo`);
+  else r.push(`1 stop via ${p.f.via.split(' ')[0]} · ${p.f.layover} layover`);
+  r.push(`${p.h.walk} min walk to ${p.h.station} · ${p.h.area}`);
+  r.push(p.left >= 0 ? `Leaves ${$(p.left)} of your budget for food and activities` : `Over budget by ${$(p.left)}`);
+  if(p.h.freeCancel) r.push(p.h.cancel);
+  return r.slice(0,3);
+}
+const PRIORITY_TXT = {balanced:'the best balance of price, travel time and location', price:'the lowest total price', travel:'the shortest travel time', location:'the most convenient hotel location'};
+
+function diffTags(a, b){
+  const t = [];
+  if(a.total < b.total) t.push(['ok', `Saves ${$(b.total-a.total)}`]);
+  if(a.f.stops===0 && b.f.stops>0) t.push(['ok','Direct flight']);
+  if(a.f.stops>0) t.push(['warn', `1 stop · ${a.f.layover}`]);
+  if(a.f.stops===b.f.stops && a.f.mins + 60 < b.f.mins) t.push(['ok', `${Math.round((b.f.mins-a.f.mins)/60)}h shorter trip`]);
+  if(a.h.walk + 2 <= b.h.walk) t.push(['ok','Closer to station']);
+  if(a.room.size >= b.room.size + 4) t.push(['ok', `Bigger room (+${a.room.size-b.room.size} m²)`]);
+  if(a.h.freeCancel && !b.h.freeCancel) t.push(['ok','Free cancellation']);
+  if(!a.h.freeCancel) t.push(['warn','Non-refundable hotel']);
+  if(a.f.lateArrival) t.push(['warn','Arrives 21:40']);
+  if(a.total > b.total && !t.length) t.push(['warn', `${$(a.total-b.total)} more`]);
+  return t.slice(0,3);
+}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+function go(screen, opts={}){
+  S.stack.push(S.screen);
+  S.screen = screen; Object.assign(S, opts); S.toast = null;
+  render(true);
+}
+function back(){ S.screen = S.stack.pop() || 'plan'; S.toast = null; render(true); }
+let toastTimer;
+function toast(msg){ S.toast = msg; render(); clearTimeout(toastTimer); toastTimer = setTimeout(()=>{S.toast=null; render();}, 2600); }
+
+/* =========================================================
+   Screens
+   ========================================================= */
+function screenPlan(){
+  const n = nights(), t = S.trip, p = S.prefs;
+  const dateErr = n <= 0 ? 'Check-out must be after check-in.' : (n > 21 ? 'Trips longer than 21 nights aren’t supported yet.' : '');
+  const budgetErr = !t.budget || t.budget < 500 ? 'Enter a budget of at least $500.' : '';
+  const prefCount = (p.stops!=='any') + p.nearStation + (p.areas.length>0) + (p.room!=='any') + (p.priority!=='balanced');
+  const seg = (key, opts) => `<div class="seg">${opts.map(([v,l])=>`<button data-act="pref" data-k="${key}" data-v="${v}" class="${p[key]===v?'on':''}">${l}</button>`).join('')}</div>`;
+  return `
+  <div class="scroll" id="scroll">
+    <div class="topbar">
+      <div class="brand"><span class="logo">${ic('compass')}</span>TravelMate</div>
+      <div class="avatar">AM</div>
+    </div>
+    <div class="px">
+      <h1>Plan a new trip</h1>
+      <p class="sub">Set your budget first. We’ll build flight + hotel packages that fit it.</p>
+    </div>
+
+    <div class="card">
+      <div class="field"><span class="ic">${ic('plane')}</span>
+        <div class="fbody"><span class="label">From</span><input type="text" id="f-from" value="${t.from}" aria-label="From"></div></div>
+      <div class="divider" style="margin:2px 0 2px 48px"></div>
+      <div class="field"><span class="ic">${ic('pin')}</span>
+        <div class="fbody"><span class="label">To</span><input type="text" id="f-to" value="${t.to}" aria-label="Destination"></div>
+        <button class="iconbtn" style="box-shadow:none;background:var(--surface-2)" data-act="swapcity" aria-label="Swap">${ic('swap')}</button></div>
+      <div class="divider"></div>
+      <div class="dates">
+        <div><span class="label">Check-in</span><div class="datebox"><button data-act="pickdate" data-v="f-in">${ic('cal')}${fmtDay(t.checkIn)}</button><input type="date" id="f-in" value="${t.checkIn}" min="2026-11-23" max="2027-12-31" tabindex="-1" aria-label="Check-in date"></div></div>
+        <span class="arrow">→</span>
+        <div><span class="label">Check-out</span><div class="datebox"><button data-act="pickdate" data-v="f-out">${ic('cal')}${fmtDay(t.checkOut)}</button><input type="date" id="f-out" value="${t.checkOut}" min="2026-11-24" max="2027-12-31" tabindex="-1" aria-label="Check-out date"></div></div>
+      </div>
+      ${dateErr ? `<div class="err">${dateErr}</div>` : `
+      <div class="nights">
+        <span class="chip brand">${ic('bed')} ${n} night${n>1?'s':''}</span>
+        <span class="chip">${ic('cal')} ${n+1} calendar days</span>
+        <span class="tiny muted">Hotel is priced per night</span>
+      </div>`}
+      <div class="divider"></div>
+      <div class="row2">
+        <div><span class="label">Adults</span>
+          <div class="stepper" style="margin-top:6px"><button data-act="step" data-k="adults" data-d="-1" ${t.adults<=1?'disabled':''} aria-label="Fewer adults">${ic('minus')}</button><b>${t.adults}</b><button data-act="step" data-k="adults" data-d="1" ${t.adults>=4?'disabled':''} aria-label="More adults">${ic('plus')}</button></div></div>
+        <div><span class="label">Rooms</span>
+          <div class="stepper" style="margin-top:6px"><button data-act="step" data-k="rooms" data-d="-1" ${t.rooms<=1?'disabled':''} aria-label="Fewer rooms">${ic('minus')}</button><b>${t.rooms}</b><button data-act="step" data-k="rooms" data-d="1" ${t.rooms>=2?'disabled':''} aria-label="More rooms">${ic('plus')}</button></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h" style="margin-bottom:0"><h3>Trip budget</h3><span class="chip ok">${ic('wallet')} Flights + hotel</span></div>
+      <div class="budget-in"><span class="cur">CAD $</span><input id="f-budget" inputmode="numeric" value="${t.budget ? t.budget.toLocaleString('en-US') : ''}" aria-label="Budget"></div>
+      ${budgetErr ? `<div class="err">${budgetErr}</div>` : ''}
+      <div class="quick">${[2500,3000,3500,4000].map(v=>`<button data-act="budget" data-v="${v}" class="${t.budget===v?'on':''}">${$(v)}</button>`).join('')}</div>
+      <p class="tiny muted" style="margin:10px 0 0;line-height:1.45">We only recommend packages that fit. You can add food, transit and activity estimates later.</p>
+    </div>
+
+    <div class="card">
+      <button class="collapse-h ${S.prefsOpen?'open':''}" data-act="prefs-toggle" aria-expanded="${S.prefsOpen}">
+        <span class="field" style="padding:0;flex:1"><span class="ic">${ic('sliders')}</span>
+          <span class="fbody"><b style="display:block;font-size:15px">Preferences <span class="muted" style="font-weight:600">· optional</span></b>
+          <span class="tiny muted">${prefCount ? prefCount+' set · tap to change' : 'Flights, hotel area, room type'}</span></span></span>
+        ${ic('down','chev')}
+      </button>
+      ${S.prefsOpen ? `
+      <div class="pref-q">What matters most to you?</div>
+      ${seg('priority',[['balanced','Balanced'],['price','Price'],['travel','Travel time'],['location','Location']])}
+      <div class="pref-q">Flights</div>
+      ${seg('stops',[['any','Any stops'],['nonstop','Nonstop only']])}
+      <div class="pref-q">Hotel location</div>
+      <div class="toggle-row"><span style="font-size:13.5px;font-weight:600;display:flex;gap:8px;align-items:center">${ic('train')} Within 5 min walk of a station</span>
+        <button class="switch ${p.nearStation?'on':''}" data-act="near" role="switch" aria-checked="${p.nearStation}" aria-label="Near a station"></button></div>
+      <div class="pills" style="margin-top:10px">${AREAS.map(a=>`<button class="pill ${p.areas.includes(a)?'on':''}" data-act="area" data-v="${a}">${p.areas.includes(a)?ic('check'):''}${a}</button>`).join('')}</div>
+      <div class="tiny muted" style="margin-top:6px">${p.areas.length ? 'Only hotels in the selected areas' : 'No area selected = any area'}</div>
+      <div class="pref-q">Room</div>
+      ${seg('room',[['any','Any'],['twin','2 separate beds'],['one','1 large bed']])}
+      ${prefCount ? `<button class="tiny" style="margin-top:14px;color:var(--brand-dk);font-weight:700" data-act="prefs-reset">Reset preferences</button>`:''}
+      ` : ''}
+    </div>
+  </div>
+  <div class="footer-cta">
+    <button class="btn" data-act="find" ${dateErr||budgetErr?'disabled':''}>Find trip options ${ic('right')}</button>
+  </div>
+  ${tabbar('plan')}`;
+}
+
+function tabbar(on){
+  return `<nav class="tabbar">
+    <button class="${on==='plan'?'on':''}" data-act="tab" data-v="plan">${ic('compass')}Plan</button>
+    <button class="${on==='trips'?'on':''}" data-act="tab" data-v="trips">${ic('bag')}My trips</button>
+    <button class="${on==='me'?'on':''}" data-act="tab" data-v="me">${ic('user')}Profile</button>
+  </nav>`;
+}
+
+function screenCompare(){
+  const {fit, out, rec} = ranked();
+  const t = S.trip, n = nights();
+  // keep compare selection valid
+  const ids = S.compare;
+  const [a, b] = ids.map(plan);
+  const prefs = S.prefs;
+  const fchips = [];
+  if(prefs.priority!=='balanced') fchips.push(['priority', {price:'Lowest price first',travel:'Shortest travel first',location:'Best location first'}[prefs.priority]]);
+  if(prefs.stops==='nonstop') fchips.push(['stops','Nonstop only']);
+  if(prefs.nearStation) fchips.push(['near','≤ 5 min to station']);
+  if(prefs.areas.length) fchips.push(['areas', prefs.areas.join(', ')]);
+  if(prefs.room!=='any') fchips.push(['room', prefs.room==='twin'?'2 separate beds':'1 large bed']);
+
+  const col = (p, o) => {
+    const isRec = rec && p.id===rec.id, mm = mismatch(p);
+    return `<div class="cmp-col ${isRec?'is-rec':''}">
+      <div class="ph" style="background-image:url(${p.h.img})">${isRec?`<span class="badge">★ Recommended</span>`:''}${!isRec && p.id==='D' && !mm.length ? '' : ''}</div>
+      <div class="pname">Plan ${p.id}</div>
+      <div class="total money">${$(p.total)}</div>
+      <div class="left ${p.left<0?'bad':''}">${p.left<0?'Over budget by '+$(p.left):$(p.left)+' left of '+$(t.budget)}</div>
+      <div class="tags">${mm.length ? mm.slice(0,2).map(m=>`<span class="chip bad">${m}</span>`).join('') : diffTags(p,o).map(([k,l])=>`<span class="chip ${k}">${l}</span>`).join('')}</div>
+    </div>`;
+  };
+  const row = (label, icon, fa, fb) => `<div class="cmp-row"><div class="rl">${ic(icon)}${label}</div><div>${fa}</div><div>${fb}</div></div>`;
+  const cls = (x, y, lowerBetter=true) => x===y ? '' : ((x<y)===lowerBetter ? 'better' : 'worse');
+  const flightCell = (p, o) => `<div class="v">${p.f.stops ? '1 stop' : 'Nonstop'} · <span class="money">${$(p.f.price)}</span></div>
+      <div class="s"><span class="${cls(p.f.mins,o.f.mins)}">${dur(p.f.mins)}</span> outbound<br>${p.f.airline}${p.f.stops ? ' via '+p.f.via.split(' ')[0] : ''}${p.f.fare==='Flex'?' · Flex fare':''}</div>`;
+  const hotelCell = (p, o) => `<div class="v">${p.h.name}</div>
+      <div class="s">${p.room.name} · <span class="${cls(p.room.size,o.room.size,false)}">${p.room.size} m²</span><br><b class="money">${$(p.perNight)}</b>/night · ${$(p.hotelTotal)} for ${n}</div>`;
+  const locCell = (p, o) => `<div class="v">${p.h.area}</div><div class="s"><span class="${cls(p.h.walk,o.h.walk)}">${p.h.walk} min walk</span> to ${p.h.station}</div>`;
+  const cancelCell = p => `<div class="s" style="margin:0">${p.h.freeCancel ? `<span class="better" style="font-weight:700">${p.h.cancel}</span>` : `<span class="worse" style="font-weight:700">Hotel non-refundable</span>`}<br>Flight: ${p.f.change.split(' · ')[1]}</div>`;
+
+  const pkRow = (p, dim) => {
+    const on = S.compare.includes(p.id), mm = mismatch(p);
+    return `<div class="pk ${dim?'dim':''}" data-act="view" data-v="${p.id}" role="button" aria-label="View Plan ${p.id}" style="cursor:pointer">
+      <div class="thumb" style="background-image:url(${p.h.img})"></div>
+      <div class="pb">
+        <div class="pt"><span>Plan ${p.id}${rec && rec.id===p.id?' <span class="chip brand" style="padding:2px 7px;font-size:10.5px;vertical-align:2px">★ Recommended</span>':''}</span><span class="money">${$(p.total)}</span></div>
+        <div class="ps">${p.f.stops?'1 stop':'Nonstop'} · ${p.h.name}, ${p.h.area} · ${p.room.name}</div>
+        <div class="pr">${mm.length ? mm.map(m=>`<span class="chip bad">${m}</span>`).join('') : `<span class="chip ok">${$(p.left)} left</span>`}</div>
+      </div>
+      <button class="cmpbox ${on?'on':''}" data-act="cmp" data-v="${p.id}" aria-label="Compare Plan ${p.id}" aria-pressed="${on}">${on?ic('check'):''}</button>
+    </div>`;
+  };
+
+  const cheaper = a.total===b.total ? null : (a.total<b.total ? a : b), pricier = cheaper ? (cheaper===a?b:a) : null;
+  let summary = '';
+  if(cheaper){
+    const extra = [];
+    if(cheaper.f.stops > pricier.f.stops) extra.push('adds a connection');
+    if(cheaper.h.walk > pricier.h.walk) extra.push(`is ${cheaper.h.walk-pricier.h.walk} min farther from the station`);
+    if(cheaper.room.size < pricier.room.size) extra.push('has a smaller room');
+    if(cheaper.f.lateArrival) extra.push('arrives late at night');
+    summary = `<b>Plan ${cheaper.id}</b> saves <b>${$(pricier.total-cheaper.total)}</b>${extra.length?' but '+extra.slice(0,2).join(' and '):''}.`;
+  }
+
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Back">${ic('left')}</button>
+      <div class="ttl"><b>Trip options</b><span>${t.to.split(',')[0]} · ${dateRange()} · ${n} nights · ${t.adults} adult${t.adults>1?'s':''}</span></div>
+      <span class="chip ok" style="padding:7px 10px">${ic('wallet')} ${$(t.budget)}</span>
+    </div>
+    <div class="filters">
+      <button class="fchip" data-act="editprefs">${ic('sliders')}Preferences${fchips.length?` · ${fchips.length}`:''}</button>
+      ${fchips.map(([k,l])=>`<button class="fchip on" data-act="clearpref" data-k="${k}">${l} ${ic('x')}</button>`).join('')}
+    </div>
+
+    ${rec ? `
+    <div class="rec">
+      <div class="rh"><span class="star">${ic('star')}</span>Recommended: Plan ${rec.id} · <span class="money">${$(rec.total)}</span></div>
+      <ul>${recReasons(rec).map(r=>`<li>${ic('check')}<span>${r}</span></li>`).join('')}</ul>
+      <div class="why">${ic('info')} <span style="vertical-align:3px">Chosen because it gives ${PRIORITY_TXT[S.prefs.priority]} among packages that match your preferences.</span></div>
+    </div>` : `
+    <div class="summary-line" style="background:var(--bad-soft)">${ic('alert')}<span>No package matches all of your preferences. Try removing a filter above, or raise your budget.</span></div>`}
+
+    <div class="sec-h"><h2>Side by side</h2>
+      <div class="picker" role="group" aria-label="Choose two plans to compare">${Object.keys(PLAN_DEF).map(id=>`<button data-act="cmp" data-v="${id}" class="${S.compare.includes(id)?'on':''} ${mismatch(plan(id)).length?'off':''}" aria-pressed="${S.compare.includes(id)}">${id}</button>`).join('')}</div>
+    </div>
+    <div class="cmp">
+      <div class="cmp-cols">${col(a,b)}${col(b,a)}</div>
+      ${row('Flight · round trip for '+t.adults,'plane', flightCell(a,b), flightCell(b,a))}
+      ${row('Hotel · '+n+' nights','bed', hotelCell(a,b), hotelCell(b,a))}
+      ${row('Location','train', locCell(a,b), locCell(b,a))}
+      ${row('Cancellation','shield', cancelCell(a), cancelCell(b))}
+      <div class="cmp-foot">
+        <button class="btn sm ${rec&&rec.id===a.id?'':'ghost'}" data-act="view" data-v="${a.id}">View Plan ${a.id}</button>
+        <button class="btn sm ${rec&&rec.id===b.id?'':'ghost'}" data-act="view" data-v="${b.id}">View Plan ${b.id}</button>
+      </div>
+    </div>
+    ${summary ? `<div class="summary-line">${ic('info')}<span>${summary}</span></div>` : ''}
+
+    <div class="sec-h"><h2>All packages</h2><span class="tiny muted">${fit.length} of 4 match</span></div>
+    ${fit.map(p=>pkRow(p,false)).join('')}
+    ${out.length ? `
+      <button class="hidden-note" data-act="showhidden">${ic(S.showHidden?'down':'right')}<span><b>${out.length} package${out.length>1?'s':''}</b> ${out.length>1?'don’t':'doesn’t'} match your preferences</span></button>
+      ${S.showHidden ? out.map(p=>pkRow(p,true)).join('') : ''}` : ''}
+    <p class="footnote">Illustrative prices in CAD, taxes included · Flights and hotel only<br>Prices checked 12 min ago</p>
+  </div>`;
+}
+
+function mapSvg(h){
+  const [x,y] = MAPXY[h.area] || [150,80];
+  const st = Object.entries({Ikebukuro:[96,26],Ueno:[196,40],'Tokyo':[214,88],Shinagawa:[150,150],Shibuya:[84,118],Shinjuku:[70,72]});
+  return `<svg viewBox="0 0 300 170" class="map" role="img" aria-label="Map of ${h.name} in ${h.area}">
+    <rect width="300" height="170" fill="#EEF1EA"/>
+    <path d="M250 0 C 262 40, 240 70, 268 100 S 280 150, 300 170 L300 0Z" fill="#DCE8EE"/>
+    <path d="M0 140 L60 150 L120 170 L0 170Z" fill="#E4EADF"/>
+    <path d="M96 26 C140 14,180 22,196 40 C214 58,222 72,214 88 C206 120,180 146,150 150 C118 154,92 140,84 118 C76 100,62 90,70 72 C76 50,80 32,96 26Z" fill="none" stroke="#7FB069" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+    <path d="M0 96 L300 70" stroke="#E9C46A" stroke-width="3" opacity=".6"/>
+    ${st.map(([n,[sx,sy]])=>`<circle cx="${sx}" cy="${sy}" r="4" fill="#fff" stroke="#3A1F14" stroke-width="1.5"/><text x="${sx+7}" y="${sy+4}" font-size="9" font-weight="600" fill="#6E5A4E">${n}</text>`).join('')}
+    <circle cx="244" cy="30" r="3" fill="#6E5A4E"/><text x="236" y="20" font-size="9" font-weight="600" fill="#6E5A4E">Asakusa</text>
+    <circle cx="208" cy="112" r="3" fill="#6E5A4E"/><text x="214" y="122" font-size="9" font-weight="600" fill="#6E5A4E">Ginza</text>
+    <text x="252" y="162" font-size="9" font-weight="700" fill="#6E5A4E">HND ↘</text>
+    <g transform="translate(${x-12},${y-30})"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 30 12 30s12-9.7 12-18.4C24 5.2 18.6 0 12 0z" fill="#E2692A"/><circle cx="12" cy="11.5" r="4.5" fill="#fff"/></g>
+  </svg>`;
+}
+
+function flightLeg(label, leg, f, isOut){
+  const mins = isOut ? f.mins : f.ret.mins;
+  return `<div class="leg">
+    <div class="leg-h"><span class="label">${label}</span><span class="tiny muted">${isOut?f.code:f.ret.code} · ${dur(mins)}</span></div>
+    <div class="leg-row">
+      <div><b>${leg.dep.split(' · ')[1]}</b><span>${leg.depA}</span><small>${leg.dep.split(' · ')[0]}</small></div>
+      <div class="leg-line"><span>${f.stops ? '1 stop · '+f.via.match(/\((\w+)\)/)[1] : 'Nonstop'}</span></div>
+      <div style="text-align:right"><b>${leg.arr.split(' · ')[1]}</b><span>${leg.arrA}</span><small>${leg.arr.split(' · ')[0]}</small></div>
+    </div>
+    ${f.stops ? `<div class="layover">${ic('clock')} Change planes in ${f.via} · ${isOut?f.layover:(f.retLayover||'2h 05m')} layover</div>`:''}
+  </div>`;
+}
+
+function screenDetails(){
+  const p = cur(), t = S.trip, rec = ranked().rec, isRec = rec && rec.id===p.id && !p.custom;
+  const o = S.open, h = p.h, f = p.f;
+  const arrive = f.out.arr.split(' · ')[1];
+  const pct = Math.min(100, Math.round(p.total / t.budget * 100));
+  const title = p.custom ? 'Your trip' : 'Plan '+p.id;
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Back to trip options">${ic('left')}</button>
+      <div class="ttl"><b>${title}${isRec?' <span class="chip brand" style="vertical-align:3px;font-size:10.5px;padding:3px 7px">★ Recommended</span>':''}</b><span>${p.custom?'Based on Plan '+p.id+' · ':''}${t.to.split(',')[0]} · ${dateRange()} · ${p.n} nights</span></div>
+      <span class="chip ok" style="padding:7px 10px">${ic('wallet')} ${$(t.budget)}</span>
+    </div>
+
+    <!-- FLIGHT -->
+    <div class="card acc ${o.flight?'open':''}">
+      <button class="acc-h" data-act="acc" data-v="flight" aria-expanded="${o.flight}">
+        <span class="acc-ic">${ic('plane')}</span>
+        <span class="acc-b"><span class="label">Flight · round trip for ${t.adults}</span>
+          <b>${f.airline} · ${f.stops?'1 stop':'Nonstop'}</b>
+          <span class="tiny muted">${f.out.dep} → ${f.out.arr.split(' · ')[1]} · ${dur(f.mins)}</span></span>
+        <span class="acc-p"><b class="money">${$(f.price)}</b><span class="tiny muted">${$(f.price/t.adults)} / person</span></span>
+      </button>
+      <button class="more" data-act="acc" data-v="flight">${o.flight?'Hide details':'Show flight details'} ${ic('down','chev')}</button>
+      ${o.flight ? `<div class="acc-body">
+        ${flightLeg('Outbound', f.out, f, true)}
+        ${flightLeg('Return', f.ret, f, false)}
+        <div class="facts">
+          <div>${ic('bag')}<span><b>Bags</b>${f.bags}</span></div>
+          <div>${ic('tag')}<span><b>${f.fare} fare</b>${f.change}</span></div>
+        </div>
+        <div class="fit ${f.lateArrival?'warn':'ok'}">${ic(f.lateArrival?'alert':'check')}<span>${f.lateArrival
+          ? `Lands late, at <b>${arrive}</b>. After arrival formalities and a ${(SPOTS[h.id].find(s=>s[0].startsWith('Haneda'))||['','40 min'])[1]} train ride, you would reach ${h.name} around 23:15. Its front desk is open 24 hours, so late check-in is OK.`
+          : `Lands at <b>${arrive}</b> on ${f.out.arr.split(' · ')[0]}. ${h.name} check-in starts at ${h.checkin}, about ${(SPOTS[h.id].find(s=>s[0].startsWith('Haneda'))||['','45 min'])[1]} from the airport by train.`}</span></div>
+        <div class="source">${ic('shield')}<span>Price from <b>${f.site}</b> · checked 12 min ago</span>
+          <button data-act="ext" data-v="${f.site}">View ${ic('ext')}</button></div>
+      </div>` : ''}
+      <div class="keep">
+        <span>${ic('lock')}<span><b>Keep this flight</b><small>${S.cur.keep?'Flight is locked. Change the hotel without losing it.':'Lock it, then change the hotel around it.'}</small></span></span>
+        <button class="switch ${S.cur.keep?'on':''}" data-act="keep" role="switch" aria-checked="${S.cur.keep}" aria-label="Keep this flight"></button>
+      </div>
+    </div>
+
+    <!-- HOTEL -->
+    <div class="card acc ${o.hotel?'open':''}">
+      <button class="acc-h" data-act="acc" data-v="hotel" aria-expanded="${o.hotel}">
+        <span class="acc-thumb" style="background-image:url(${h.img})"></span>
+        <span class="acc-b"><span class="label">Hotel · ${p.n} nights</span>
+          <b>${h.name}</b>
+          <span class="tiny muted">${p.room.name} · ${h.area} · ★ ${h.rating}</span></span>
+        <span class="acc-p"><b class="money">${$(p.hotelTotal)}</b><span class="tiny muted">${$(p.perNight)} / night</span></span>
+      </button>
+      <button class="more" data-act="acc" data-v="hotel">${o.hotel?'Hide details':'Show rooms, prices & location'} ${ic('down','chev')}</button>
+      ${o.hotel ? `<div class="acc-body">
+        <div class="gallery">${(h.gallery||[h.imgLg]).map((g,i)=>`<div style="background-image:url(${g})" class="${i?'':'big'}"></div>`).join('')}</div>
+        <div class="sub-h">Choose your room</div>
+        ${h.rooms.map((r,i)=>{ const tot = hotelCost(r,p.n); const on = i===S.cur.room; return `
+          <button class="room ${on?'on':''}" data-act="room" data-v="${i}" role="radio" aria-checked="${on}">
+            <span class="radio"></span>
+            <span class="rb"><b>${r.name}</b><small>${r.size} m² · sleeps 2 · ${r.beds>1?'separate beds':'one shared bed'}</small></span>
+            <span class="rp"><b class="money">${$(tot)}</b><small>${$(Math.round(tot/p.n))}/night</small></span>
+          </button>`; }).join('')}
+        <div class="sub-h">Price per night · ${p.room.name}</div>
+        <div class="nightly">${nightDates().map((d,i)=>`<div><span>${d}</span><b class="money">${$(p.room.rates[i % p.room.rates.length])}</b></div>`).join('')}
+          <div class="tot"><span>${p.n} nights · taxes included</span><b class="money">${$(p.hotelTotal)}</b></div></div>
+        <div class="facts">
+          <div>${ic('cal')}<span><b>Check-in ${h.checkin}</b>Check-out ${h.checkout}</span></div>
+          <div class="${h.freeCancel?'okc':'warnc'}">${ic('shield')}<span><b>${h.freeCancel?'Free cancellation':'Non-refundable'}</b>${h.freeCancel?h.cancel.replace('Free cancellation ',''):'No refund if you cancel'}</span></div>
+        </div>
+        <div class="sub-h">Location · ${h.area}</div>
+        ${mapSvg(h)}
+        <div class="spots">
+          <div><span>${ic('walk')} ${h.station}</span><b>${h.walk} min walk</b></div>
+          ${SPOTS[h.id].map(([n,tm])=>`<div><span>${ic(tm.includes('walk')?'walk':'train')} ${n}</span><b>${tm}</b></div>`).join('')}
+        </div>
+        <div class="tiny muted" style="margin-top:6px">${h.address}</div>
+        <div class="source">${ic('shield')}<span>Rates from <b>${h.site}</b> · ${h.reviews.toLocaleString()} guest reviews</span>
+          <button data-act="ext" data-v="${h.site}">View ${ic('ext')}</button></div>
+      </div>` : ''}
+      <button class="btn ghost sm" style="margin-top:12px" data-act="changehotel">${ic('swap')} Change hotel${S.cur.keep?' · flight stays the same':''}</button>
+    </div>
+
+    <!-- BUDGET -->
+    <div class="card">
+      <div class="card-h"><h3>Budget</h3><span class="tiny muted">${pct}% of ${$(t.budget)} used</span></div>
+      <div class="bline"><span>${ic('plane')} Flights for ${t.adults}</span><b class="money">${$(f.price)}</b></div>
+      <div class="bline"><span>${ic('bed')} Hotel · ${p.n} nights</span><b class="money">${$(p.hotelTotal)}</b></div>
+      <div class="bar"><span style="width:${pct}%" class="${p.left<0?'over':''}"></span></div>
+      <div class="bline big"><span>${p.left<0?'Over budget':'Left for the rest of the trip'}</span><b class="money ${p.left<0?'neg':'pos'}">${$(p.left)}</b></div>
+      ${S.extrasSaved ? (()=>{ const x = extrasCost(p.n), r = p.left - x.sum; return `
+        <div class="bline"><span>${ic('tag')} Food, transit & activities (est.)</span><b class="money">${$(x.sum)}</b></div>
+        <div class="bline"><span>After estimates</span><b class="money ${r<0?'neg':'pos'}">${r<0?'−':''}${$(r)}</b></div>`; })() : ''}
+      <button class="linkbtn" data-act="budgetpage">${S.extrasSaved?'Edit food, transit & activity estimates':'Estimate food, transit & activities'} ${ic('right')}</button>
+    </div>
+    <p class="footnote">Illustrative prices in CAD, taxes included</p>
+  </div>
+  <div class="footer-cta solo bar-cta">
+    <div><span class="tiny muted">Total</span><b class="money">${$(p.total)}</b><span class="tiny ${p.left<0?'neg':'pos'}" style="font-weight:700">${p.left<0?'Over by '+$(p.left):$(p.left)+' left'}</span></div>
+    <button class="btn" data-act="review">Review trip ${ic('right')}</button>
+  </div>`;
+}
+
+function screenHotels(){
+  const c = S.cur, t = S.trip, f = FLIGHTS[c.flight], current = cur();
+  const pick = S.hotelPick || c.hotel;
+  const room = S.hotelRoom;
+  const list = Object.values(HOTELS).map(h => {
+    let ri = h.rooms.findIndex(r => room==='twin' ? r.beds>=2 : room==='one' ? r.beds===1 : true);
+    if(h.id===c.hotel && (room==='any' || (room==='twin' ? h.rooms[c.room].beds>=2 : h.rooms[c.room].beds===1))) ri = c.room;
+    const ok = ri >= 0; const cb = combo(c.flight, h.id, ok?ri:0);
+    return {h, ri:ok?ri:0, ok, ...cb};
+  });
+  const sorters = {price:(a,b)=>a.hotelTotal-b.hotelTotal, walk:(a,b)=>a.h.walk-b.h.walk, rating:(a,b)=>b.h.rating-a.h.rating};
+  list.sort((a,b)=> (b.ok - a.ok) || sorters[S.hotelSort](a,b));
+  const sel = list.find(x=>x.h.id===pick) || list[0];
+  const remain = t.budget - f.price;
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Cancel">${ic('x')}</button>
+      <div class="ttl"><b>Change hotel</b><span>Your flight stays the same · ${current.n} nights</span></div>
+    </div>
+    <div class="kept">
+      <span class="acc-ic">${ic('plane')}</span>
+      <div style="flex:1;min-width:0"><b>${f.airline} · ${f.stops?'1 stop':'Nonstop'}</b><span class="tiny muted" style="display:block">${f.out.dep} → ${f.out.arr} · ${$(f.price)}</span></div>
+      <span class="chip ok">${ic('lock')} Flight kept</span>
+    </div>
+    <div class="summary-line" style="margin-top:2px">${ic('wallet')}<span><b>${$(remain)}</b> of your ${$(t.budget)} budget is left for the hotel (${current.n} nights) and the rest of your trip.</span></div>
+    <div class="px" style="margin-bottom:8px"><div class="label" style="margin-bottom:6px">Room</div>
+      <div class="seg">${[['any','Any room'],['twin','2 separate beds'],['one','1 large bed']].map(([v,l])=>`<button data-act="hroom" data-v="${v}" class="${room===v?'on':''}">${l}</button>`).join('')}</div></div>
+    <div class="px" style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span class="label">Sort</span>
+      ${[['price','Lowest price'],['walk','Closest to station'],['rating','Top rated']].map(([v,l])=>`<button class="fchip ${S.hotelSort===v?'on':''}" data-act="hsort" data-v="${v}">${l}</button>`).join('')}</div>
+    ${list.map(x => { const on = x.h.id===sel.h.id, isCur = x.h.id===c.hotel && x.ri===c.room; const diff = x.hotelTotal - current.hotelTotal; return `
+      <div class="hcard ${on?'on':''} ${x.ok?'':'dim'}" data-act="hpick" data-v="${x.h.id}" role="radio" aria-checked="${on}" tabindex="0">
+        <div class="hph" style="background-image:url(${x.h.img})">${isCur?'<span class="badge">Current hotel</span>':''}</div>
+        <div class="hb">
+          <div class="pt"><b>${x.h.name}</b><span class="radio ${on?'on':''}"></span></div>
+          <div class="tiny muted">${x.h.area} · ${x.h.walk} min walk to ${x.h.station} · ★ ${x.h.rating}</div>
+          <div class="tiny" style="margin-top:4px">${x.ok ? `${x.room.name} · ${x.room.size} m² · <b>${$(x.perNight)}</b>/night` : `<span class="neg" style="font-weight:700">No room with ${room==='twin'?'2 separate beds':'1 large bed'}</span>`}</div>
+          <div class="hrow">
+            <span><span class="tiny muted">Hotel total</span> <b class="money">${$(x.hotelTotal)}</b></span>
+            ${isCur ? '<span class="chip">Current</span>' : diff===0 ? '<span class="chip">Same price</span>' : diff<0 ? `<span class="chip ok">Save ${$(diff)}</span>` : `<span class="chip warn">+${$(diff)} vs current</span>`}
+          </div>
+          <div class="tiny money" style="margin-top:4px;font-weight:700"><span class="${x.left<0?'neg':'pos'}">${x.left<0?'Trip over budget by '+$(x.left):'Trip total '+$(x.total)+' · '+$(x.left)+' left'}</span></div>
+        </div>
+      </div>`; }).join('')}
+  </div>
+  <div class="footer-cta solo">
+    <div class="eq"><span><small>Flight</small><b class="money">${$(f.price)}</b></span><i>+</i><span><small>Hotel</small><b class="money">${$(sel.hotelTotal)}</b></span><i>=</i><span class="nt"><small>New total</small><b class="money">${$(sel.total)}</b></span>
+      <span class="chip ${sel.left<0?'bad':'ok'}" style="margin-left:auto">${sel.left<0?'Over '+$(sel.left):$(sel.left)+' left'}</span></div>
+    <button class="btn" data-act="hsave" ${!sel.ok?'disabled':''}>${sel.h.id===c.hotel && sel.ri===c.room ? 'Keep current hotel' : 'Save hotel change'}</button>
+  </div>`;
+}
+
+/* ---------- full-trip budget (A2 Change 6, DR1) ---------- */
+function stackBar(parts, budget){
+  const total = parts.reduce((s,p)=>s+p[1],0), scale = Math.max(total, budget);
+  return `<div class="stack">${parts.map(([k,v])=>`<span style="width:${v/scale*100}%;background:${SEG_COLORS[k]}"></span>`).join('')}</div>
+    <div class="stack-mark" style="left:${budget/scale*100}%"><span>Budget ${$(budget)}</span></div>`;
+}
+function screenBudget(){
+  const p = cur(), t = S.trip, x = extrasCost(p.n), e = S.extras;
+  const full = p.total + x.sum, left = t.budget - full;
+  const parts = [['flight',p.f.price],['hotel',p.hotelTotal],['food',x.food],['transit',x.transit],['acts',x.acts]];
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Back">${ic('left')}</button>
+      <div class="ttl"><b>Full trip budget</b><span>${t.adults} adults · ${x.days} calendar days · estimates you can edit</span></div>
+    </div>
+    <div class="card">
+      <div class="label">Estimated trip total</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 10px">
+        <b class="money" style="font-size:30px;letter-spacing:-.6px">${$(full)}</b>
+        <span class="chip ${left<0?'bad':'ok'}">${left<0?'Over by '+$(left):$(left)+' to spare'}</span>
+      </div>
+      <div style="position:relative;padding-top:18px">${stackBar(parts, t.budget)}</div>
+      <div class="legend">${[['flight','Flights'],['hotel','Hotel'],['food','Food'],['transit','Transit'],['acts','Activities']].map(([k,l])=>`<span><i style="background:${SEG_COLORS[k]}"></i>${l}</span>`).join('')}</div>
+      ${left<0 ? `<div class="fit warn" style="margin-top:12px">${ic('alert')}<span>Flights and hotel fit your budget, but the whole trip is about <b>${$(left)}</b> over. Try a lower food level, fewer activities, or a cheaper hotel.</span></div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Booked in this plan</h3><span class="chip">${ic('lock')} Fixed</span></div>
+      <div class="bline"><span>${ic('plane')} Flights for ${t.adults}</span><b class="money">${$(p.f.price)}</b></div>
+      <div class="bline"><span>${ic('bed')} ${p.h.name} · ${p.n} nights</span><b class="money">${$(p.hotelTotal)}</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>${ic('tag')} Food</h3><b class="money">${$(x.food)}</b></div>
+      <div class="seg">${Object.entries(FOOD).map(([k,v])=>`<button data-act="food" data-v="${k}" class="${e.food===k?'on':''}">${v[1]} · $${v[0]}</button>`).join('')}</div>
+      <div class="tiny muted" style="margin-top:8px">${FOOD[e.food][2]} · per person per day × ${t.adults} × ${x.days} days</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>${ic('train')} Local transit</h3><b class="money">${$(x.transit)}</b></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13.5px">Trains and subway per person / day</span>
+        <div class="stepper"><button data-act="transit" data-d="-2" ${e.transit<=2?'disabled':''} aria-label="Less transit">${ic('minus')}</button><b class="money" style="min-width:34px">$${e.transit}</b><button data-act="transit" data-d="2" ${e.transit>=30?'disabled':''} aria-label="More transit">${ic('plus')}</button></div>
+      </div>
+      <div class="tiny muted" style="margin-top:8px">Includes the airport train both ways ($30 per person). Your hotel is ${p.h.walk} min from ${p.h.station}.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>${ic('star')} Activities</h3><b class="money">${$(x.acts)}</b></div>
+      ${ACTS.map(a=>{ const on = e.acts.includes(a.id); return `
+        <button class="act ${on?'on':''}" data-act="actt" data-v="${a.id}" role="checkbox" aria-checked="${on}">
+          <span class="cbox">${on?ic('check'):''}</span>
+          <span style="flex:1;text-align:left"><b>${a.name}</b><small>${a.note}</small></span>
+          <span class="money" style="font-weight:700">$${a.price}<small style="display:block;text-align:right">/ person</small></span>
+        </button>`; }).join('')}
+    </div>
+    <p class="footnote">Estimates use typical Tokyo prices in CAD. They are not booked or charged.</p>
+  </div>
+  <div class="footer-cta solo bar-cta">
+    <div><span class="tiny muted">Trip total</span><b class="money">${$(full)}</b><span class="tiny ${left<0?'neg':'pos'}" style="font-weight:700">${left<0?'Over by '+$(left):$(left)+' to spare'}</span></div>
+    <button class="btn" data-act="saveextras">Save estimates</button>
+  </div>`;
+}
+
+/* ---------- review (A2 Change 5) ---------- */
+function screenReview(){
+  const p = cur(), t = S.trip, f = p.f, h = p.h, x = S.extrasSaved ? extrasCost(p.n) : null;
+  const rec = ranked().rec;
+  const pct = Math.min(100, Math.round(p.total / t.budget * 100));
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Back">${ic('left')}</button>
+      <div class="ttl"><b>Review your trip</b><span>Check everything before you confirm</span></div>
+    </div>
+    <div class="banner" style="background-image:linear-gradient(90deg,rgba(58,31,20,.55),rgba(58,31,20,0) 70%),url(img/tokyo.jpg)">
+      <b>Tokyo for ${t.adults===2?'two':t.adults}</b><span>${fmtDay(t.checkIn)} – ${fmtDay(t.checkOut)}</span>
+    </div>
+
+    <div class="card rv">
+      <div class="rv-h"><span>${ic('cal')} Dates & travelers</span><button data-act="edit" data-v="trip">Edit</button></div>
+      <div class="rv-grid">
+        <div><small>Check-in</small><b>${fmtDay(t.checkIn)}</b></div>
+        <div><small>Check-out</small><b>${fmtDay(t.checkOut)}</b></div>
+        <div><small>Hotel stay</small><b>${p.n} nights</b><small>${p.n+1} calendar days</small></div>
+        <div><small>Travelers</small><b>${t.adults} adults · ${t.rooms} room</b></div>
+      </div>
+    </div>
+
+    <div class="card rv">
+      <div class="rv-h"><span>${ic('plane')} Flight</span><button data-act="edit" data-v="flight">Edit</button></div>
+      <div class="rv-row"><div><b>${f.airline} · ${f.stops?'1 stop via '+f.via.split(' ')[0]:'Nonstop'}</b>
+        <small>Out: ${f.out.dep} ${f.out.depA} → ${f.out.arr} ${f.out.arrA}</small>
+        <small>Back: ${f.ret.dep} ${f.ret.depA} → ${f.ret.arr} ${f.ret.arrA}</small>
+        <small>${f.bags} · ${f.change}</small></div>
+        <div class="rv-p"><b class="money">${$(f.price)}</b>${S.cur.keep?`<span class="chip ok">${ic('lock')} Kept</span>`:''}</div></div>
+    </div>
+
+    <div class="card rv">
+      <div class="rv-h"><span>${ic('bed')} Hotel</span><button data-act="edit" data-v="hotel">Edit</button></div>
+      <div class="rv-row"><div style="display:flex;gap:10px"><span class="acc-thumb" style="background-image:url(${h.img});width:52px;height:52px"></span>
+        <div><b>${h.name}</b><small>${p.room.name} · ${p.room.size} m² · ${h.area}</small><small>Check-in ${h.checkin} · Check-out ${h.checkout}</small>
+        <small class="${h.freeCancel?'pos':'neg'}" style="font-weight:700">${h.cancel}</small></div></div>
+        <div class="rv-p"><b class="money">${$(p.hotelTotal)}</b><small>${$(p.perNight)} × ${p.n} nights</small></div></div>
+    </div>
+
+    <div class="card rv">
+      <div class="rv-h"><span>${ic('wallet')} Budget</span><button data-act="edit" data-v="budget">${x?'Edit':'Add estimates'}</button></div>
+      <div class="bline"><span>Flights + hotel</span><b class="money">${$(p.total)}</b></div>
+      <div class="bline"><span>Your budget</span><b class="money">${$(t.budget)}</b></div>
+      <div class="bar"><span style="width:${pct}%" class="${p.left<0?'over':''}"></span></div>
+      <div class="bline big"><span>${p.left<0?'Over budget':'Remaining'}</span><b class="money ${p.left<0?'neg':'pos'}">${$(p.left)}</b></div>
+      ${x ? `<div class="divider" style="margin:8px 0"></div>
+        <div class="bline"><span>Food, transit & activities (estimate)</span><b class="money">${$(x.sum)}</b></div>
+        <div class="bline"><span><b style="color:var(--ink)">After estimates</b></span><b class="money ${p.left-x.sum<0?'neg':'pos'}">${p.left-x.sum<0?'−':''}${$(p.left-x.sum)}</b></div>` : ''}
+    </div>
+
+    ${rec && rec.id===p.id && !p.custom ? `<div class="summary-line">${ic('star')}<span><b>Why we recommended this plan</b><br>${recReasons(p).join(' · ')}</span></div>` : ''}
+    <div class="summary-line" style="background:var(--ok-soft)">${ic('shield')}<span><b>Nothing is booked yet.</b> Confirming saves this plan and sends you to ${f.site} and ${h.site} to pay. Prices are checked again before you pay.</span></div>
+  </div>
+  <div class="footer-cta solo bar-cta">
+    <div><span class="tiny muted">Total</span><b class="money">${$(p.total)}</b><span class="tiny ${p.left<0?'neg':'pos'}" style="font-weight:700">${p.left<0?'Over by '+$(p.left):$(p.left)+' left'}</span></div>
+    <button class="btn" data-act="confirm" ${p.left<0?'disabled':''}>${ic('check')} Confirm plan</button>
+  </div>`;
+}
+
+/* ---------- saved trip helpers ---------- */
+function savedCalc(){
+  const s = S.saved, f = FLIGHTS[s.flight], h = HOTELS[s.hotel], room = h.rooms[s.room];
+  let hotelTotal = 0; for(let i=0;i<s.n;i++) hotelTotal += room.rates[(s.start+i) % room.rates.length];
+  const total = f.price + hotelTotal;
+  return {s, f, h, room, hotelTotal, total, left: s.budget - total};
+}
+const shiftDay = str => { const [d,t] = str.split(' · '); const [m,n] = d.split(' '); return `${m} ${+n+1} · ${t}`; };
+const altFlight = fid => fid==='F2' ? 'F1' : 'F2';
+function addDays(iso, k){ const d = parseD(iso); d.setDate(d.getDate()+k); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function screenDone(){
+  const {s, f, h, room, hotelTotal, total, left} = savedCalc();
+  return `
+  <div class="scroll" id="scroll">
+    <div class="done-hero">
+      <div class="done-ic">${ic('check')}</div>
+      <h1 style="margin:14px 0 4px">Trip planned!</h1>
+      <p class="sub" style="margin:0">Tokyo for two · ${fmtD(s.checkIn)}–${fmtD(s.checkOut).split(' ')[1]} · ${s.n} nights</p>
+    </div>
+    <div class="card">
+      <div class="bline"><span>${ic('plane')} ${f.airline} · ${f.stops?'1 stop':'Nonstop'}</span><b class="money">${$(f.price)}</b></div>
+      <div class="bline"><span>${ic('bed')} ${h.name} · ${room.name}</span><b class="money">${$(hotelTotal)}</b></div>
+      <div class="divider" style="margin:8px 0"></div>
+      <div class="bline big"><span>Total · ${$(left)} left of ${$(s.budget)}</span><b class="money">${$(total)}</b></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Next: finish booking</h3><span class="tiny muted">2 steps</span></div>
+      <button class="step" data-act="ext" data-v="${f.site}"><span class="num">1</span><span><b>Pay for your flight</b><small>${f.code} · on ${f.site}</small></span>${ic('ext')}</button>
+      <button class="step" data-act="ext" data-v="${h.site}"><span class="num">2</span><span><b>Pay for your hotel</b><small>${room.name} · on ${h.site}</small></span>${ic('ext')}</button>
+      <p class="tiny muted" style="margin:10px 0 0;line-height:1.45">We’ll keep watching this trip and tell you if a flight time, price or hotel booking changes.</p>
+    </div>
+  </div>
+  <div class="footer-cta solo" style="display:grid;gap:10px">
+    <button class="btn" data-act="tab" data-v="trips">View in My trips</button>
+    <button class="btn ghost sm" data-act="newtrip">Plan another trip</button>
+  </div>`;
+}
+
+/* ---------- My trips + plan change (DR4) ---------- */
+function screenTrips(){
+  if(!S.saved) return `<div class="scroll" id="scroll">
+      <div class="topbar"><div class="brand"><span class="logo">${ic('compass')}</span>My trips</div></div>
+      <div class="empty">${ic('bag')}<b>No trips yet</b><span>Trips you confirm will appear here, and we’ll tell you if anything changes.</span>
+      <button class="btn sm" style="width:auto;padding:0 20px;margin-top:6px" data-act="tab" data-v="plan">Plan a trip</button></div>
+    </div>${tabbar('trips')}`;
+  const {s, f, h, room, hotelTotal, total, left} = savedCalc();
+  const moved = s.change === 'pending';
+  return `
+  <div class="scroll" id="scroll">
+    <div class="topbar"><div class="brand"><span class="logo">${ic('compass')}</span>My trips</div><div class="avatar">AM</div></div>
+    ${moved ? `<button class="alert-card" data-act="impact">
+      <span class="al-ic">${ic('alert')}</span>
+      <span style="flex:1;text-align:left"><b>${f.airline} changed your flight</b><small>${f.code} now leaves ${shiftDay(f.out.dep).split(' · ')[0]} and lands ${shiftDay(f.out.arr).split(' · ')[0]}. 1 booking is affected. Tap to review.</small></span>${ic('right')}</button>` : ''}
+    <div class="trip">
+      <div class="banner sm" style="background-image:linear-gradient(90deg,rgba(58,31,20,.6),rgba(58,31,20,0) 75%),url(img/tokyo.jpg)">
+        <b>Tokyo for two</b><span>${fmtDay(s.checkIn)} – ${fmtDay(s.checkOut)} · ${s.n} nights</span>
+        <span class="chip ${moved?'warn':'ok'}" style="position:absolute;right:12px;top:12px">${moved?'Action needed':'Planned'}</span>
+      </div>
+      <div class="trip-b">
+        <div class="trow ${moved?'flag':''}"><span class="acc-ic" style="width:38px;height:38px">${ic('plane')}</span>
+          <div style="flex:1"><b>${f.airline} ${f.code}</b><small>${s.flightMoved ? `${shiftDay(f.out.dep)} ${f.out.depA} → ${shiftDay(f.out.arr)} ${f.out.arrA}` : `${f.out.dep} ${f.out.depA} → ${f.out.arr} ${f.out.arrA}`}</small>
+          ${moved?'<small class="neg" style="font-weight:700">Schedule changed by airline</small>':''}</div><b class="money">${$(f.price)}</b></div>
+        <div class="trow ${moved?'flag':''}"><span class="acc-thumb" style="background-image:url(${h.img});width:38px;height:38px;border-radius:11px"></span>
+          <div style="flex:1"><b>${h.name}</b><small>${room.name} · ${fmtD(s.checkIn)}–${fmtD(s.checkOut)} · ${s.n} nights${s.unusedNight?' (first night unused)':''}</small>
+          ${moved?`<small class="warnt" style="font-weight:700">Affected: night of ${fmtD(s.checkIn)} would be unused</small>`:''}</div><b class="money">${$(hotelTotal)}</b></div>
+        <div class="bline big" style="margin-top:6px"><span>Total</span><b class="money">${$(total)}</b></div>
+        <div class="tiny ${left<0?'neg':'pos'}" style="font-weight:700;text-align:right">${$(left)} left of ${$(s.budget)}</div>
+        ${s.applied ? `<div class="fit ok" style="margin-top:10px">${ic('check')}<span>${s.applied}</span></div>`:''}
+      </div>
+    </div>
+    ${!moved && !s.applied ? `<button class="hidden-note" style="margin:6px 20px" data-act="simulate">${ic('clock')}<span>Study demo: simulate an airline schedule change</span></button>` : ''}
+  </div>${tabbar('trips')}`;
+}
+
+function screenImpact(){
+  const {s, f, h, room} = savedCalc();
+  const n0 = fmtD(s.checkIn), n1 = fmtD(addDays(s.checkIn,1)), last = fmtD(addDays(s.checkOut,-1));
+  const alt = FLIGHTS[altFlight(s.flight)], first = room.rates[0];
+  const opts = [
+    h.freeCancel
+      ? {id:'shorten', title:`Shorten hotel to ${s.n-1} nights`, desc:`Check in ${n1} instead of ${n0}. Free, because ${h.name} offers ${h.cancel.replace('Free','free')}.`, tag:['ok','Recommended · saves '+$(first)]}
+      : {id:'shorten', title:`Shorten hotel to ${s.n-1} nights`, desc:`Check in ${n1} instead of ${n0}. ${h.name} is non-refundable, so the hotel may still charge this night.`, tag:['warn','May not save money']},
+    {id:'rebook', title:`Switch to a flight that still lands ${f.out.arr.split(' · ')[0]}`, desc:`${alt.code} · ${alt.stops?'1 stop via '+alt.via.split(' ')[0]:'Nonstop'} · lands ${alt.out.arr}. No change fee, because the airline changed your flight.${alt.stops?' Adds a '+alt.layover+' layover.':''}`, tag:['warn',alt.stops?'Same price · 1 stop':'Same price · nonstop']},
+    {id:'keep', title:'Keep everything as it is', desc:`You would still pay for the night of ${n0} at ${h.name} but not use it.`, tag:['bad','Wastes '+$(first)]},
+  ];
+  const pick = S.impactPick || 'shorten';
+  return `
+  <div class="scroll" id="scroll">
+    <div class="navbar">
+      <button class="iconbtn" data-act="back" aria-label="Back">${ic('left')}</button>
+      <div class="ttl"><b>Flight change</b><span>Tokyo for two · see what’s affected</span></div>
+    </div>
+    <div class="card">
+      <div class="label" style="margin-bottom:8px">What changed</div>
+      <div class="chg"><span>Before</span><div><s>${f.out.dep} ${f.out.depA} → ${f.out.arr} ${f.out.arrA}</s></div></div>
+      <div class="chg"><span>Now</span><div><b>${shiftDay(f.out.dep)} ${f.out.depA} → ${shiftDay(f.out.arr)} ${f.out.arrA}</b><small>${f.code} · ${f.airline} moved it by one day</small></div></div>
+    </div>
+    <div class="card">
+      <div class="label" style="margin-bottom:8px">Affected bookings</div>
+      <div class="aff bad">${ic('bed')}<span><b>${h.name} · night of ${n0}</b><small>You would land the next day, so this night would be unused (${$(first)}).</small></span></div>
+      <div class="aff ok">${ic('check')}<span><b>Hotel nights ${n1}–${last.split(' ')[1]}</b><small>Not affected.</small></span></div>
+      <div class="aff ok">${ic('check')}<span><b>Return flight · ${f.ret.dep.split(' · ')[0]}</b><small>Not affected.</small></span></div>
+    </div>
+    <div class="sec-h"><h2>Choose what to do</h2></div>
+    ${opts.map(o=>`<button class="opt ${pick===o.id?'on':''}" data-act="ipick" data-v="${o.id}" role="radio" aria-checked="${pick===o.id}">
+      <span class="radio ${pick===o.id?'on':''}"></span>
+      <span style="flex:1;text-align:left"><b>${o.title}</b><small>${o.desc}</small><span class="chip ${o.tag[0]}" style="margin-top:6px">${o.tag[1]}</span></span>
+    </button>`).join('')}
+  </div>
+  <div class="footer-cta solo"><button class="btn" data-act="iapply">Apply change</button></div>`;
+}
+
+function screenMe(){
+  return `<div class="scroll" id="scroll">
+    <div class="topbar"><div class="brand"><span class="logo">${ic('compass')}</span>Profile</div></div>
+    <div class="card" style="display:flex;gap:14px;align-items:center">
+      <div class="avatar" style="width:54px;height:54px;font-size:18px">AM</div>
+      <div><b style="font-size:17px">Alex Morgan</b><div class="tiny muted">Toronto · Home airport YYZ · CAD</div></div>
+    </div>
+    <div class="card">
+      <div class="bline"><span>${ic('wallet')} Currency</span><b>CAD $</b></div>
+      <div class="bline"><span>${ic('plane')} Home airport</span><b>Toronto (YYZ)</b></div>
+      <div class="bline"><span>${ic('sliders')} Saved preferences</span><b>${S.prefs.stops==='nonstop'?'Nonstop only':'None'}</b></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>For usability study moderators</h3></div>
+      <p class="tiny muted" style="margin:0 0 10px;line-height:1.5">Clears all choices and saved trips so the next participant starts fresh. Prices are sample data.</p>
+      <button class="btn ghost sm" data-act="reset">Reset prototype</button>
+    </div>
+    <p class="footnote">TravelMate · CSC318 high-fidelity prototype · Group Agent</p>
+  </div>${tabbar('me')}`;
+}
+
+function screenPlaceholder(title){
+  return `<div class="scroll" id="scroll">
+    <div class="navbar"><button class="iconbtn" data-act="back" aria-label="Back">${ic('left')}</button><div class="ttl"><b>${title}</b></div></div>
+    <div class="placeholder">This screen is built in the next step.</div></div>`;
+}
+
+/* =========================================================
+   Render + events
+   ========================================================= */
+const app = document.getElementById('app');
+function render(resetScroll){
+  const sc = document.getElementById('scroll');
+  const keep = !resetScroll && sc ? sc.scrollTop : 0;
+  let html = '';
+  switch(S.screen){
+    case 'plan': html = screenPlan(); break;
+    case 'compare': html = screenCompare(); break;
+    case 'details': html = screenDetails(); break;
+    case 'hotels': html = screenHotels(); break;
+    case 'budget': html = screenBudget(); break;
+    case 'review': html = screenReview(); break;
+    case 'done': html = screenDone(); break;
+    case 'impact': html = screenImpact(); break;
+    case 'trips': html = screenTrips(); break;
+    case 'me': html = screenMe(); break;
+  }
+  if(S.loading) html += `<div class="loading"><div class="spin"></div><b>Building packages for ${S.trip.to.split(',')[0]}…</b>
+    <div class="steps"><div>${ic('check')} Checking flights from ${S.trip.from.match(/\((\w+)\)/)?.[1]||'YYZ'}</div><div>${ic('check')} Pricing ${nights()} hotel nights</div><div>${ic('check')} Matching your ${$(S.trip.budget)} budget</div></div></div>`;
+  if(S.toast) html += `<div class="toast ${S.toastShown===S.toast?'stay':''}" role="status">${ic('info')}<span>${S.toast}</span></div>`;
+  S.toastShown = S.toast;
+  app.innerHTML = html;
+  const nsc = document.getElementById('scroll');
+  if(nsc) nsc.scrollTop = keep;
+}
+
+app.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if(!el || el.disabled) return;
+  const act = el.dataset.act, v = el.dataset.v, k = el.dataset.k;
+  switch(act){
+    case 'back':
+      if(S.screen==='budget' && S.extrasBackup){ S.extras = JSON.parse(S.extrasBackup); }
+      back(); break;
+    case 'pickdate': { const inp = document.getElementById(v); try{ inp.showPicker(); }catch(_){ inp.style.pointerEvents='auto'; inp.focus(); inp.click(); } break; }
+    case 'tab': S.stack = []; S.screen = v; S.toast = null; render(true); break;
+    case 'step': { const max = {adults:4, rooms:2}[k]; S.trip[k] = Math.min(max, Math.max(1, S.trip[k] + Number(el.dataset.d))); render(); break; }
+    case 'budget': S.trip.budget = Number(v); render(); break;
+    case 'prefs-toggle': S.prefsOpen = !S.prefsOpen; render(); break;
+    case 'pref': S.prefs[k] = v; S.roomPick = {}; render(); break;
+    case 'near': S.prefs.nearStation = !S.prefs.nearStation; render(); break;
+    case 'area': { const a = S.prefs.areas; const i = a.indexOf(v); i<0 ? a.push(v) : a.splice(i,1); render(); break; }
+    case 'prefs-reset': S.prefs = {stops:'any', nearStation:false, areas:[], room:'any', priority:'balanced'}; S.roomPick = {}; render(); break;
+    case 'swapcity': toast('This demo plans trips from Toronto. Other origins are coming soon.'); break;
+    case 'find': {
+      const to = S.trip.to.toLowerCase();
+      if(!to.includes('tokyo')){ toast('This demo has sample packages for Tokyo only. Please keep “Tokyo, Japan”.'); return; }
+      S.loading = true; render();
+      setTimeout(()=>{ S.loading = false; const {fit} = ranked();
+        if(fit.length >= 2) S.compare = [fit[0].id, fit[1].id];
+        else if(fit.length === 1) S.compare = [fit[0].id, Object.keys(PLAN_DEF).find(x=>x!==fit[0].id)];
+        S.showHidden = false; go('compare'); }, 1100);
+      break;
+    }
+    case 'editprefs': S.prefsOpen = true; back(); break;
+    case 'clearpref': {
+      if(k==='priority') S.prefs.priority='balanced'; if(k==='stops') S.prefs.stops='any'; if(k==='near') S.prefs.nearStation=false;
+      if(k==='areas') S.prefs.areas=[]; if(k==='room') { S.prefs.room='any'; S.roomPick={}; }
+      render(); break;
+    }
+    case 'cmp': {
+      const c = S.compare;
+      if(c.includes(v)){ toast('Pick another plan to replace it — two plans are always compared.'); return; }
+      c.shift(); c.push(v); render(); break;
+    }
+    case 'showhidden': S.showHidden = !S.showHidden; render(); break;
+    case 'view': {
+      if(e.target.closest('.cmpbox')) return;
+      S.cur = {base:v, flight:PLAN_DEF[v].flight, hotel:PLAN_DEF[v].hotel, room:roomIndex(v), keep:false};
+      S.open = {flight:false, hotel:false};
+      go('details'); break;
+    }
+    case 'acc': S.open[v] = !S.open[v]; render(); break;
+    case 'keep': S.cur.keep = !S.cur.keep; if(S.cur.keep) toast(`Flight kept. Tap “Change hotel” to find a hotel that fits the remaining ${$(S.trip.budget - FLIGHTS[S.cur.flight].price)}.`); else render(); break;
+    case 'room': S.cur.room = Number(v); S.roomPick[S.cur.base] = Number(v); render(); break;
+    case 'ext': toast(`In the real app this opens ${v} in your browser to book or check details.`); break;
+    case 'changehotel':
+      if(!S.cur.keep){ S.cur.keep = true; }
+      S.hotelPick = S.cur.hotel; S.hotelSort = 'price';
+      S.hotelRoom = S.prefs.room !== 'any' ? S.prefs.room : (HOTELS[S.cur.hotel].rooms[S.cur.room].beds > 1 ? 'twin' : 'any');
+      go('hotels'); break;
+    case 'hpick': S.hotelPick = v; render(); break;
+    case 'hsort': S.hotelSort = v; render(); break;
+    case 'hroom': S.hotelRoom = v; render(); break;
+    case 'hsave': {
+      const h = HOTELS[S.hotelPick];
+      const room = S.hotelRoom;
+      let ri = h.rooms.findIndex(r => room==='twin' ? r.beds>=2 : room==='one' ? r.beds===1 : true);
+      if(h.id===S.cur.hotel && (room==='any' || (room==='twin' ? h.rooms[S.cur.room].beds>=2 : h.rooms[S.cur.room].beds===1))) ri = S.cur.room;
+      const changed = h.id!==S.cur.hotel || ri!==S.cur.room;
+      S.cur.hotel = h.id; S.cur.room = Math.max(0, ri);
+      S.screen = S.stack.pop() || 'details';
+      render(true);
+      if(changed){ const p = cur(); toast(`Hotel changed to ${h.name}. New total ${$(p.total)} · ${$(p.left)} left.`); }
+      break;
+    }
+    case 'budgetpage': S.extrasBackup = JSON.stringify(S.extras); go('budget'); break;
+    case 'review': go('review'); break;
+    case 'food': S.extras.food = v; render(); break;
+    case 'transit': S.extras.transit = Math.min(30, Math.max(2, S.extras.transit + Number(el.dataset.d))); render(); break;
+    case 'actt': { const a = S.extras.acts, i = a.indexOf(v); i<0 ? a.push(v) : a.splice(i,1); render(); break; }
+    case 'saveextras': S.extrasSaved = true; back(); toast('Estimates saved. They are included in your budget summary.'); break;
+    case 'edit':
+      if(v==='trip'){ S.stack = []; S.screen = 'plan'; render(true); toast('Change your trip details, then tap “Find trip options” again.'); }
+      else if(v==='budget'){ S.extrasBackup = JSON.stringify(S.extras); go('budget'); }
+      else { S.open = {flight:v==='flight', hotel:v==='hotel'}; back(); }
+      break;
+    case 'confirm': {
+      const p = cur();
+      S.saved = {base:p.id, flight:S.cur.flight, hotel:S.cur.hotel, room:S.cur.room, start:0, n:p.n,
+        checkIn:S.trip.checkIn, checkOut:S.trip.checkOut, budget:S.trip.budget, change:null, applied:'', flightMoved:false, unusedNight:false};
+      S.stack = []; S.screen = 'done'; S.toast = null; render(true); break;
+    }
+    case 'newtrip': S.stack = []; S.screen = 'plan'; render(true); break;
+    case 'simulate': S.saved.change = 'pending'; S.saved.flightMoved = true; render(); toast(`New notification: ${FLIGHTS[S.saved.flight].airline} changed your flight.`); break;
+    case 'impact': S.impactPick = 'shorten'; go('impact'); break;
+    case 'ipick': S.impactPick = v; render(); break;
+    case 'iapply': {
+      const s = S.saved, h = HOTELS[s.hotel], first = h.rooms[s.room].rates[0];
+      if(S.impactPick==='shorten'){
+        s.start = 1; s.n -= 1; s.checkIn = addDays(s.checkIn, 1);
+        s.applied = h.freeCancel ? `Hotel shortened to ${s.n} nights (${fmtD(s.checkIn)}–${fmtD(s.checkOut).split(' ')[1]}). You saved ${$(first)}.` : `Hotel shortened to ${s.n} nights. Contact ${h.name} about the non-refundable night.`;
+      } else if(S.impactPick==='rebook'){
+        s.flight = altFlight(s.flight); s.flightMoved = false;
+        s.applied = `Rebooked to ${FLIGHTS[s.flight].code}. You still land ${FLIGHTS[s.flight].out.arr.split(' · ')[0]} and keep all ${s.n} hotel nights.`;
+      } else {
+        s.unusedNight = true; s.applied = `Kept as is. The night of ${fmtD(s.checkIn)} will be unused.`;
+      }
+      s.change = 'done'; S.stack = []; S.screen = 'trips'; render(true); toast('Trip updated.'); break;
+    }
+    case 'reset': {
+      const fresh = JSON.parse(FRESH); Object.keys(S).forEach(k=>delete S[k]); Object.assign(S, fresh);
+      S.screen = 'plan'; render(true); toast('Prototype reset. Ready for the next participant.'); break;
+    }
+  }
+});
+app.addEventListener('input', e => {
+  const id = e.target.id;
+  if(id==='f-budget'){
+    const digits = e.target.value.replace(/[^\d]/g,'').slice(0,6);
+    S.trip.budget = digits ? Number(digits) : 0;
+    const pos = e.target.selectionStart; render();
+    const inp = document.getElementById('f-budget'); inp.focus();
+    try{ inp.setSelectionRange(inp.value.length, inp.value.length); }catch(_){}
+  }
+  if(id==='f-from') S.trip.from = e.target.value;
+  if(id==='f-to') S.trip.to = e.target.value;
+});
+app.addEventListener('change', e => {
+  const id = e.target.id;
+  if(id==='f-in'){ S.trip.checkIn = e.target.value; render(); }
+  if(id==='f-out'){ S.trip.checkOut = e.target.value; render(); }
+});
+render(true);
+</script>
+</body>
+</html>
